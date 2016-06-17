@@ -106,6 +106,14 @@ export default {
       secretKey
     } = keys;
 
+    if (!accessKey) {
+      throw new Error('Required *accessKey* not provided');
+    }
+
+    if (!secretKey) {
+      throw new Error('Required *secretKey* not provided');
+    }
+
     const client = new this.Client({
       accessKey,
       secretKey,
