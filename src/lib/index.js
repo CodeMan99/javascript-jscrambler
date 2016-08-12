@@ -132,7 +132,7 @@ export default {
         }
       }
 
-      const _zip = await zip(filesSrc, cwd);
+      const _zip = await zip(_filesSrc, cwd);
 
       const removeSourceRes = await this.removeSourceFromApplication(client, '', applicationId);
       if (removeSourceRes.errors) {
