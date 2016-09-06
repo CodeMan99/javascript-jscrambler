@@ -14,6 +14,20 @@ Jscrambler Client for Browser and Node.js
   - [Quick example](#quick-example)
 - [JScrambler Parameters](#jscrambler-parameters)
 
+## Installation
+
+On your project:
+
+```js
+npm i jscrambler --save-dev
+```
+
+Or globally:
+
+```js
+npm i -g jscrambler
+```
+
 ## RC configuration
 You may put your access and secret keys into a config file if found in [these directories](https://github.com/dominictarr/rc#standards). Besides simplifying the command entry, this has the added benefit of not logging your Jscrambler credentials.
 
@@ -94,12 +108,12 @@ where `config.json` is an object optionally containing any of the JScrambler opt
 
 ## API
 ```bash
-npm install javascript-jscrambler
+npm install jscrambler
 ```
 
 ### Quick example
 ```javascript
-import jScrambler from 'javascript-jscrambler';
+import jScrambler from 'jscrambler';
 
 (async () => {
   try {
