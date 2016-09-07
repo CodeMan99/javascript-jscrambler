@@ -20,6 +20,7 @@ commander
   .option('-i, --application-id <id>', 'Application ID')
   .option('-o, --output-dir <dir>', 'Output directory')
   .option('-p, --port <port>', 'Port')
+  .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .parse(process.argv);
 
@@ -40,6 +41,7 @@ config.host = commander.host || config.host;
 config.port = commander.port || config.port;
 config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
+config.cwd = commander.cwd || config.cwd;
 
 config = defaults(config, _config);
 
@@ -70,7 +72,8 @@ const {
   port,
   applicationTypes,
   languageSpecifications,
-  areSubscribersOrdered
+  areSubscribersOrdered,
+  cwd
 } = config;
 
 const params = mergeAndParseParams(commander, config.params);
@@ -92,7 +95,8 @@ const params = mergeAndParseParams(commander, config.params);
         params,
         applicationTypes,
         languageSpecifications,
-        areSubscribersOrdered
+        areSubscribersOrdered,
+        cwd
       });
   } catch (error) {
     console.error(error);
