@@ -75,9 +75,10 @@ npm install -g jscrambler
     -a, --access-key <accessKey>  Access key
     -c, --config <config>         JScrambler configuration options
     -H, --host <host>             Hostname
-    -i, --application-id <id>      Application ID
+    -i, --application-id <id>     Application ID
     -o, --output-dir <dir>        Output directory
     -p, --port <port>             Port
+    -C, --cwd <dir>               Current Working Directory
     -s, --secret-key <secretKey>  Secret key
 
 
