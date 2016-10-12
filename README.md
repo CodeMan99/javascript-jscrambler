@@ -114,34 +114,33 @@ npm install jscrambler
 
 ### Quick example
 ```javascript
-import jScrambler from 'jscrambler';
+var jscrambler = require('jscrambler').default;
 
-(async () => {
-  try {
-    await jScrambler
-      .protectAndDownload({
-        keys: {
-          accessKey: 'AAAA',
-          secretKey: 'SSSS'
-        },
-        host: 'api4.jscrambler.com',
-        port: 443,
-        applicationId: 'APP_ID',
-        filesSrc: [
-          '/path/to/src.html',
-          '/path/to/src.js'
-        ],
-        filesDest: '/path/to/destDir/',
-        params: {
-          stringSplitting: {
-            chunk: 1
-          }
-        }
-      });
-  } catch (err) {
-    console.error(err);
+jscrambler.protectAndDownload({
+  keys: {
+    accessKey: 'YOUR_JSCRAMBLER_ACCESS_KEY',
+    secretKey: 'YOUR_JSCRAMBLER_SECRET_KEY'
+  },
+  host: 'api4.jscrambler.com',
+  port: 443,
+  applicationId: 'YOUR_APPLICATION_ID',
+  filesSrc: [
+    '/path/to/src/*.html',
+    '/path/to/src/*.js'
+  ],
+  filesDest: '/path/to/destDir/',
+  params: {
+    stringSplitting: {
+      chunk: 1
+    }
   }
-})();
+})
+.then(function () {
+  console.log('All done!');
+})
+.catch(function () {
+  console.error('Something went wrong...');
+});
 ```
 
 More detailed informations can be found [here](https://docs.jscrambler.com/api/clients.html).
