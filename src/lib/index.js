@@ -246,7 +246,6 @@ export default {
   },
   //
   async cancelProtection (client, id, appId, fragments) {
-    console.log("cancelProtection Javascript Client");
     const deferred = Q.defer();
     client.post('/application', cancelProtection(id, appId, fragments), responseHandler(deferred));
     return deferred.promise;

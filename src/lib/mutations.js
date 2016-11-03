@@ -82,7 +82,6 @@ const cancelProtectionDefaultFragments = `
 `;
 
 export function cancelProtection (id, appId, fragments = cancelProtectionDefaultFragments) {
-  console.log("sending To API");
   return {
     query: `
       mutation cancelProtection ($_id: String!, $applicationId: String!) {
