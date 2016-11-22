@@ -73,7 +73,8 @@ const {
   applicationTypes,
   languageSpecifications,
   areSubscribersOrdered,
-  cwd
+  cwd,
+  sourceMaps = false
 } = config;
 
 const params = mergeAndParseParams(commander, config.params);
@@ -96,7 +97,8 @@ const params = mergeAndParseParams(commander, config.params);
         applicationTypes,
         languageSpecifications,
         areSubscribersOrdered,
-        cwd
+        cwd,
+        sourceMaps
       });
   } catch (error) {
     console.error(error);

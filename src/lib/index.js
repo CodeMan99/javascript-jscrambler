@@ -98,7 +98,9 @@ export default {
       cwd,
       params,
       applicationTypes,
-      languageSpecifications
+      languageSpecifications,
+      sourceMaps,
+      areSubscribersOrdered
     } = config;
 
     const {
@@ -175,6 +177,10 @@ export default {
 
     if (languageSpecifications) {
       $set.languageSpecifications = languageSpecifications;
+    }
+
+    if (typeof sourceMaps !== undefined) {
+      $set.sourceMaps = JSON.stringify(sourceMaps);
     }
 
     if ($set.parameters || $set.applicationTypes || $set.languageSpecifications ||
