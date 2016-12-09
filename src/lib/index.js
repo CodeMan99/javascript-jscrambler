@@ -199,7 +199,47 @@ export default {
     errorHandler(download);
     unzip(download, filesDest || destCallback);
   },
-  //
+
+  async downloadSourceMaps (configs, destCallback) {
+    const {
+      keys,
+      host,
+      port,
+      filesDest,
+      filesSrc,
+      protectionId
+    } = configs;
+
+    const {
+      accessKey,
+      secretKey
+    } = keys;
+
+    const client = new this.Client({
+      accessKey,
+      secretKey,
+      host,
+      port
+    });
+
+    if (!filesDest && !destCallback) {
+      throw new Error('Required *filesDest* not provided');
+    }
+
+    if (!protectionId) {
+      throw new Error('Required *protectionId* not provided');
+    }
+
+
+    if (filesSrc) {
+      console.log('[Warning] Ignoring sources supplied. Downloading source maps of given protection');
+    }
+
+    const download = await this.downloadSourceMapsRequest(client, protectionId);
+    errorHandler(download);
+    unzip(download, filesDest || destCallback);
+  },
+
   async pollProtection (client, applicationId, protectionId) {
     const deferred = Q.defer();
 
@@ -358,6 +398,12 @@ export default {
   async getApplicationProtection (client, applicationId, protectionId, fragments) {
     const deferred = Q.defer();
     client.get('/application', getProtection(applicationId, protectionId, fragments), responseHandler(deferred));
+    return deferred.promise;
+  },
+  //
+  async downloadSourceMapsRequest (client, protectionId) {
+    const deferred = Q.defer();
+    client.get(`/application/sourceMaps/${protectionId}`, null, responseHandler(deferred), false);
     return deferred.promise;
   },
   //
