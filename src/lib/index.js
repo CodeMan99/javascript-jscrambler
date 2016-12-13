@@ -246,6 +246,7 @@ export default {
     const poll = async () => {
       const applicationProtection = await this.getApplicationProtection(client, applicationId, protectionId);
       if (applicationProtection.errors) {
+        console.log('Error polling protection', applicationProtection.errors);
         throw new Error('Error polling protection');
         deferred.reject('Error polling protection');
       } else {

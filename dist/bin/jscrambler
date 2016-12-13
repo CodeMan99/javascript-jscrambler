@@ -74,19 +74,19 @@ if (globSrc && globSrc.length) {
   }
 }
 
-var _config2 = config;
-var applicationId = _config2.applicationId;
-var accessKey = _config2.accessKey;
-var secretKey = _config2.secretKey;
-var filesDest = _config2.filesDest;
-var host = _config2.host;
-var port = _config2.port;
-var applicationTypes = _config2.applicationTypes;
-var languageSpecifications = _config2.languageSpecifications;
-var areSubscribersOrdered = _config2.areSubscribersOrdered;
-var cwd = _config2.cwd;
-var _config2$sourceMaps = _config2.sourceMaps;
-var sourceMaps = _config2$sourceMaps === undefined ? false : _config2$sourceMaps;
+var _config2 = config,
+    applicationId = _config2.applicationId,
+    accessKey = _config2.accessKey,
+    secretKey = _config2.secretKey,
+    filesDest = _config2.filesDest,
+    host = _config2.host,
+    port = _config2.port,
+    applicationTypes = _config2.applicationTypes,
+    languageSpecifications = _config2.languageSpecifications,
+    areSubscribersOrdered = _config2.areSubscribersOrdered,
+    cwd = _config2.cwd,
+    _config2$sourceMaps = _config2.sourceMaps,
+    sourceMaps = _config2$sourceMaps === undefined ? false : _config2$sourceMaps;
 
 
 var params = (0, _cli.mergeAndParseParams)(_commander2.default, config.params);
