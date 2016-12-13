@@ -198,6 +198,7 @@ export default {
     const download = await this.downloadApplicationProtection(client, protectionId);
     errorHandler(download);
     unzip(download, filesDest || destCallback);
+    console.log(protectionId);
   },
 
   async downloadSourceMaps (configs, destCallback) {
