@@ -331,7 +331,6 @@ exports.default = {
               _context2.prev = 21;
               _context2.t0 = _context2['catch'](15);
 
-              console.log('catch');
               errorHandler(_context2.t0);
 
             case 25:
