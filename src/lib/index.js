@@ -235,9 +235,12 @@ export default {
     if (filesSrc) {
       console.log('[Warning] Ignoring sources supplied. Downloading source maps of given protection');
     }
-
-    const download = await this.downloadSourceMapsRequest(client, protectionId);
-    errorHandler(download);
+    let download;
+    try {
+      download = await this.downloadSourceMapsRequest(client, protectionId);
+    } catch (e) {
+      errorHandler(e);
+    }
     unzip(download, filesDest || destCallback);
   },
 
@@ -458,6 +461,10 @@ function errorHandler (res) {
     res.errors.forEach(function (error) {
       throw new Error(error.message);
     });
+  }
+
+  if (res.message) {
+    throw new Error(res.message);
   }
 
   return res;
