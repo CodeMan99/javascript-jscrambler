@@ -198,14 +198,56 @@ export default {
     const download = await this.downloadApplicationProtection(client, protectionId);
     errorHandler(download);
     unzip(download, filesDest || destCallback);
+    console.log(protectionId);
   },
-  //
+
+  async downloadSourceMaps (configs, destCallback) {
+    const {
+      keys,
+      host,
+      port,
+      filesDest,
+      filesSrc,
+      protectionId
+    } = configs;
+
+    const {
+      accessKey,
+      secretKey
+    } = keys;
+
+    const client = new this.Client({
+      accessKey,
+      secretKey,
+      host,
+      port
+    });
+
+    if (!filesDest && !destCallback) {
+      throw new Error('Required *filesDest* not provided');
+    }
+
+    if (!protectionId) {
+      throw new Error('Required *protectionId* not provided');
+    }
+
+
+    if (filesSrc) {
+      console.log('[Warning] Ignoring sources supplied. Downloading source maps of given protection');
+    }
+
+    const download = await this.downloadSourceMapsRequest(client, protectionId);
+    errorHandler(download);
+    unzip(download, filesDest || destCallback);
+  },
+
   async pollProtection (client, applicationId, protectionId) {
     const deferred = Q.defer();
 
     const poll = async () => {
       const applicationProtection = await this.getApplicationProtection(client, applicationId, protectionId);
       if (applicationProtection.errors) {
+        console.log('Error polling protection', applicationProtection.errors);
         throw new Error('Error polling protection');
         deferred.reject('Error polling protection');
       } else {
@@ -358,6 +400,12 @@ export default {
   async getApplicationProtection (client, applicationId, protectionId, fragments) {
     const deferred = Q.defer();
     client.get('/application', getProtection(applicationId, protectionId, fragments), responseHandler(deferred));
+    return deferred.promise;
+  },
+  //
+  async downloadSourceMapsRequest (client, protectionId) {
+    const deferred = Q.defer();
+    client.get(`/application/sourceMaps/${protectionId}`, null, responseHandler(deferred), false);
     return deferred.promise;
   },
   //

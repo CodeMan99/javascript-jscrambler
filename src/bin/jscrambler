@@ -22,6 +22,7 @@ commander
   .option('-p, --port <port>', 'Port')
   .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
+  .option('-m, --source-maps <id>', 'Download source maps')
   .parse(process.argv);
 
 var globSrc, filesSrc, config;
@@ -79,29 +80,52 @@ const {
 
 const params = mergeAndParseParams(commander, config.params);
 
-// Go, go, go
-(async () => {
-  try {
-    await jScrambler
-      .protectAndDownload({
-        keys: {
-          accessKey,
-          secretKey
-        },
-        host,
-        port,
-        applicationId,
-        filesSrc,
-        filesDest,
-        params,
-        applicationTypes,
-        languageSpecifications,
-        areSubscribersOrdered,
-        cwd,
-        sourceMaps
-      });
-  } catch (error) {
-    console.error(error);
-    process.exit(1);
-  }
-})();
+if (commander.sourceMaps) {
+  // Go, go, go download
+  (async () => {
+    try {
+      await jScrambler
+        .downloadSourceMaps({
+          keys: {
+            accessKey,
+            secretKey
+          },
+          host,
+          port,
+          filesDest,
+          filesSrc,
+          protectionId: commander.sourceMaps
+        });
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
+  })();
+} else {
+  // Go, go, go
+  (async () => {
+    try {
+      await jScrambler
+        .protectAndDownload({
+          keys: {
+            accessKey,
+            secretKey
+          },
+          host,
+          port,
+          applicationId,
+          filesSrc,
+          filesDest,
+          params,
+          applicationTypes,
+          languageSpecifications,
+          areSubscribersOrdered,
+          cwd,
+          sourceMaps
+        });
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
+  })();
+}
