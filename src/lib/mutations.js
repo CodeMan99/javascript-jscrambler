@@ -77,6 +77,26 @@ export function removeProtection (id, appId, fragments = removeProtectionDefault
   };
 }
 
+const cancelProtectionDefaultFragments = `
+  _id
+`;
+
+export function cancelProtection (id, appId, fragments = cancelProtectionDefaultFragments) {
+  return {
+    query: `
+      mutation cancelProtection ($_id: String!, $applicationId: String!) {
+        cancelProtection (_id: $_id, applicationId: $applicationId) {
+          ${fragments}
+        }
+      }
+    `,
+    params: {
+      _id: id,
+      applicationId: appId
+    }
+  };
+}
+
 const updateApplicationDefaultFragments = `
   _id,
   createdAt,

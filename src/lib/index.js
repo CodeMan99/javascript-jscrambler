@@ -20,6 +20,7 @@ import {
   updateTemplate,
   createApplicationProtection,
   removeProtection,
+  cancelProtection,
   duplicateApplication,
   unlockApplication,
   applyTemplate
@@ -292,6 +293,12 @@ export default {
   async removeProtection (client, id, appId, fragments) {
     const deferred = Q.defer();
     client.post('/application', removeProtection(id, appId, fragments), responseHandler(deferred));
+    return deferred.promise;
+  },
+  //
+  async cancelProtection (client, id, appId, fragments) {
+    const deferred = Q.defer();
+    client.post('/application', cancelProtection(id, appId, fragments), responseHandler(deferred));
     return deferred.promise;
   },
   //
