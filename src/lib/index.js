@@ -185,7 +185,7 @@ export default {
       $set.sourceMaps = JSON.stringify(sourceMaps);
     }
 
-    if (typeof randomizationSeed !== undefined || randomizationSeed) {
+    if (typeof randomizationSeed !== undefined) {
       $set.randomizationSeed = JSON.stringify(randomizationSeed);
     }
 
