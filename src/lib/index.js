@@ -101,6 +101,7 @@ export default {
       applicationTypes,
       languageSpecifications,
       sourceMaps,
+      randomizationSeed,
       areSubscribersOrdered
     } = config;
 
@@ -182,6 +183,10 @@ export default {
 
     if (typeof sourceMaps !== undefined) {
       $set.sourceMaps = JSON.stringify(sourceMaps);
+    }
+
+    if (typeof randomizationSeed !== undefined || randomizationSeed) {
+      $set.randomizationSeed = JSON.stringify(randomizationSeed);
     }
 
     if ($set.parameters || $set.applicationTypes || $set.languageSpecifications ||

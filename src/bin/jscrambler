@@ -23,6 +23,7 @@ commander
   .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .option('-m, --source-maps <id>', 'Download source maps')
+  .option('-R, --randomization-seed <seed>', 'Set randomization seed')
   .parse(process.argv);
 
 var globSrc, filesSrc, config;
@@ -42,6 +43,7 @@ config.host = commander.host || config.host;
 config.port = commander.port || config.port;
 config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
+config.randomizationSeed = commander.randomizationSeed || config.randomizationSeed;
 config.cwd = commander.cwd || config.cwd;
 
 config = defaults(config, _config);
@@ -75,6 +77,7 @@ const {
   languageSpecifications,
   areSubscribersOrdered,
   cwd,
+  randomizationSeed = false,
   sourceMaps = false
 } = config;
 
@@ -121,7 +124,8 @@ if (commander.sourceMaps) {
           languageSpecifications,
           areSubscribersOrdered,
           cwd,
-          sourceMaps
+          sourceMaps,
+          randomizationSeed
         });
     } catch (error) {
       console.error(error);
