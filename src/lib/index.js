@@ -101,7 +101,8 @@ export default {
       applicationTypes,
       languageSpecifications,
       sourceMaps,
-      areSubscribersOrdered
+      areSubscribersOrdered,
+      useRecommendedOrder
     } = config;
 
     const {
@@ -174,6 +175,10 @@ export default {
 
     if (applicationTypes) {
       $set.applicationTypes = applicationTypes;
+    }
+
+    if (useRecommendedOrder) {
+      $set.useRecommendedOrder = useRecommendedOrder;
     }
 
     if (languageSpecifications) {
