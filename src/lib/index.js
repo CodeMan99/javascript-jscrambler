@@ -185,17 +185,13 @@ export default {
       $set.sourceMaps = JSON.stringify(sourceMaps);
     }
 
-    if (typeof randomizationSeed !== undefined) {
-      $set.randomizationSeed = JSON.stringify(randomizationSeed);
-    }
-
     if ($set.parameters || $set.applicationTypes || $set.languageSpecifications ||
         typeof $set.areSubscribersOrdered !== 'undefined') {
       const updateApplicationRes = await this.updateApplication(client, $set);
       errorHandler(updateApplicationRes);
     }
 
-    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId);
+    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId, {}, randomizationSeed);
     errorHandler(createApplicationProtectionRes);
 
     const protectionId = createApplicationProtectionRes.data.createApplicationProtection._id;
@@ -406,9 +402,9 @@ export default {
     return deferred.promise;
   },
   //
-  async createApplicationProtection (client, applicationId, fragments) {
+  async createApplicationProtection (client, applicationId, fragments, randomizationSeed) {
     const deferred = Q.defer();
-    client.post('/application', createApplicationProtection(applicationId, fragments), responseHandler(deferred));
+    client.post('/application', createApplicationProtection(applicationId, fragments, randomizationSeed), responseHandler(deferred));
     return deferred.promise;
   },
   //

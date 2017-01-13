@@ -283,17 +283,18 @@ const createProtectionDefaultFragments = `
   state
 `;
 
-export function createApplicationProtection (applicationId, fragments = createProtectionDefaultFragments) {
+export function createApplicationProtection (applicationId, fragments = createProtectionDefaultFragments, randomizationSeed) {
   return {
     query: `
-      mutation createApplicationProtection ($applicationId: String!) {
+      mutation createApplicationProtection ($applicationId: String!, $randomizationSeed: String) {
         createApplicationProtection (applicationId: $applicationId) {
           ${fragments}
         }
       }
     `,
     params: {
-      applicationId: applicationId
+      applicationId: applicationId,
+      randomizationSeed: randomizationSeed
     }
   };
 }
