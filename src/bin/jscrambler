@@ -77,7 +77,7 @@ const {
   languageSpecifications,
   areSubscribersOrdered,
   cwd,
-  randomizationSeed = false,
+  randomizationSeed,
   sourceMaps = false
 } = config;
 
