@@ -287,7 +287,7 @@ export function createApplicationProtection (applicationId, fragments = createPr
   return {
     query: `
       mutation createApplicationProtection ($applicationId: String!, $randomizationSeed: String) {
-        createApplicationProtection (applicationId: $applicationId) {
+        createApplicationProtection (applicationId: $applicationId, randomizationSeed: $randomizationSeed) {
           ${fragments}
         }
       }

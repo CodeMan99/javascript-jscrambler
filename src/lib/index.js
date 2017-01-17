@@ -191,7 +191,7 @@ export default {
       errorHandler(updateApplicationRes);
     }
 
-    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId, {}, randomizationSeed);
+    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId, undefined, randomizationSeed);
     errorHandler(createApplicationProtectionRes);
 
     const protectionId = createApplicationProtectionRes.data.createApplicationProtection._id;
