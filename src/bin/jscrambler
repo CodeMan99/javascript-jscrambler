@@ -23,7 +23,7 @@ commander
   .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .option('-m, --source-maps <id>', 'Download source maps')
-  .option('-ro, --use-recommended-order', 'Use recommended order')
+  .option('--recommended-order', 'Use recommended order')
   .parse(process.argv);
 
 var globSrc, filesSrc, config;
@@ -44,7 +44,7 @@ config.port = commander.port || config.port;
 config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
 config.cwd = commander.cwd || config.cwd;
-config.useRecommendedOrder = commander.useRecommendedOrder || config.useRecommendedOrder;
+config.useRecommendedOrder = commander.recommendedOrder || config.useRecommendedOrder;
 
 config = defaults(config, _config);
 
