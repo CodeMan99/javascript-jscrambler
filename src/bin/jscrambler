@@ -11,6 +11,8 @@ import _config from '../lib/config';
 import jScrambler from '../lib';
 import {mergeAndParseParams} from '../lib/cli';
 
+const debug = !!process.env.DEBUG;
+
 commander
   .version(require('../../package.json').version)
   .usage('[options] <file ...>')
@@ -60,9 +62,21 @@ if (globSrc && globSrc.length) {
   for (let i = 0, l = globSrc.length; i < l; ++i) {
     // Calling sync `glob` because async is pointless for the CLI use case
     // (as of now at least)
-    filesSrc = filesSrc.concat(glob.sync(globSrc[i], {
+    const tmpGlob = glob.sync(globSrc[i], {
       dot: true
-    }));
+    });
+
+    if (debug) {
+      if (tmpGlob.length === 0) {
+        console.log(`Pattern "${globSrc[i]}" doesn't match any files. Will be ignored.`);
+      } else {
+        console.log(`Pattern "${globSrc[i]}" matched the following files:`);
+        tmpGlob.forEach(file => {
+          console.log(`    ${file}`);
+        });
+      }
+    }
+    filesSrc = filesSrc.concat(tmpGlob);
   }
 }
 
