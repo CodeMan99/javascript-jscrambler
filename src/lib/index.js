@@ -102,7 +102,8 @@ export default {
       languageSpecifications,
       sourceMaps,
       areSubscribersOrdered,
-      useRecommendedOrder
+      useRecommendedOrder,
+      bail
     } = config;
 
     const {
@@ -216,6 +217,9 @@ export default {
     });
 
     errors.forEach(e => console.error(`Non-fatal error: "${e.message}" in ${e.filename}`));
+    if (bail && errors.length > 0) {
+      throw new Error('An error ocurred while parsing a file');
+    }
 
     const download = await this.downloadApplicationProtection(client, protectionId);
     errorHandler(download);
