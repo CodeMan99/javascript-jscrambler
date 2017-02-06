@@ -130,7 +130,9 @@ export default {
       for (let i = 0, l = filesSrc.length; i < l; ++i) {
         if (typeof filesSrc[i] === 'string') {
           // TODO Replace `glob.sync` with async version
-          _filesSrc = _filesSrc.concat(glob.sync(filesSrc[i], {dot: true}));
+          _filesSrc = _filesSrc.concat(glob.sync(filesSrc[i], {
+            dot: true
+          }));
         } else {
           _filesSrc.push(filesSrc[i]);
         }
@@ -153,7 +155,9 @@ export default {
       }
 
       const addApplicationSourceRes = await this.addApplicationSource(client, applicationId, {
-        content: _zip.generate({type: 'base64'}),
+        content: _zip.generate({
+          type: 'base64'
+        }),
         filename: 'application.zip',
         extension: 'zip'
       });
@@ -190,7 +194,7 @@ export default {
     }
 
     if ($set.parameters || $set.applicationTypes || $set.languageSpecifications ||
-        typeof $set.areSubscribersOrdered !== 'undefined') {
+      typeof $set.areSubscribersOrdered !== 'undefined') {
       const updateApplicationRes = await this.updateApplication(client, $set);
       errorHandler(updateApplicationRes);
     }
@@ -199,7 +203,19 @@ export default {
     errorHandler(createApplicationProtectionRes);
 
     const protectionId = createApplicationProtectionRes.data.createApplicationProtection._id;
-    await this.pollProtection(client, applicationId, protectionId);
+    const sources = await this.pollProtection(client, applicationId, protectionId);
+
+    const errors = [];
+    sources.forEach(s => {
+      if (s.errorMessages && s.errorMessages.length > 0) {
+        errors.push(...s.errorMessages.map(e => ({
+          filename: s.filename,
+          ...e
+        })));
+      }
+    });
+
+    errors.forEach(e => console.error(`Non-fatal error: "${e.message}" in ${e.filename}`));
 
     const download = await this.downloadApplicationProtection(client, protectionId);
     errorHandler(download);
@@ -253,12 +269,11 @@ export default {
   async pollProtection (client, applicationId, protectionId) {
     const deferred = Q.defer();
 
-    const poll = async () => {
+    const poll = async() => {
       const applicationProtection = await this.getApplicationProtection(client, applicationId, protectionId);
       if (applicationProtection.errors) {
         console.log('Error polling protection', applicationProtection.errors);
         throw new Error('Error polling protection');
-        deferred.reject('Error polling protection');
       } else {
         const state = applicationProtection.data.applicationProtection.state;
         if (state !== 'finished' && state !== 'errored') {
@@ -267,7 +282,7 @@ export default {
           const url = `https://app.jscrambler.com/app/${applicationId}/protections/${protectionId}`;
           deferred.reject(`Protection failed. For more information visit: ${url}`);
         } else {
-          deferred.resolve();
+          deferred.resolve(applicationProtection.data.applicationProtection.sources);
         }
       }
     };
@@ -376,7 +391,7 @@ export default {
   async addApplicationSourceFromURL (client, applicationId, url, fragments) {
     const deferred = Q.defer();
     return getFileFromUrl(client, url)
-      .then(function(file) {
+      .then(function (file) {
         client.post('/application', addApplicationSource(applicationId, file, fragments), responseHandler(deferred));
         return deferred.promise;
       });
@@ -491,7 +506,7 @@ function normalizeParameters (parameters) {
       result.push({
         name,
         options: parameters[name]
-      })
+      });
     });
   } else {
     result = parameters;
