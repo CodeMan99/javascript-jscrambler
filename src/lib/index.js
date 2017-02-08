@@ -200,14 +200,14 @@ export default {
       errorHandler(updateApplicationRes);
     }
 
-    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId);
+    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId, bail);
     errorHandler(createApplicationProtectionRes);
 
     const protectionId = createApplicationProtectionRes.data.createApplicationProtection._id;
-    const sources = await this.pollProtection(client, applicationId, protectionId);
+    const protection = await this.pollProtection(client, applicationId, protectionId);
 
     const errors = [];
-    sources.forEach(s => {
+    protection.sources.forEach(s => {
       if (s.errorMessages && s.errorMessages.length > 0) {
         errors.push(...s.errorMessages.map(e => ({
           filename: s.filename,
@@ -216,9 +216,11 @@ export default {
       }
     });
 
-    errors.forEach(e => console.error(`Non-fatal error: "${e.message}" in ${e.filename}`));
-    if (bail && errors.length > 0) {
-      throw new Error('An error ocurred while parsing a file');
+    if (!bail && errors.length > 0) {
+      errors.forEach(e => console.error(`Non-fatal error: "${e.message}" in ${e.filename}`));
+    } else if (bail && protection.state === 'errored') {
+      errors.forEach(e => console.error(`Error: "${e.message}" in ${e.filename}${e.line ? `:${e.line}` : ''}`));
+      throw new Error('Parsing errors ocurred');
     }
 
     const download = await this.downloadApplicationProtection(client, protectionId);
@@ -280,13 +282,14 @@ export default {
         throw new Error('Error polling protection');
       } else {
         const state = applicationProtection.data.applicationProtection.state;
+        const bail = applicationProtection.data.applicationProtection.bail;
         if (state !== 'finished' && state !== 'errored') {
           setTimeout(poll, 500);
-        } else if (state === 'errored') {
+        } else if (state === 'errored' && !bail) {
           const url = `https://app.jscrambler.com/app/${applicationId}/protections/${protectionId}`;
           deferred.reject(`Protection failed. For more information visit: ${url}`);
         } else {
-          deferred.resolve(applicationProtection.data.applicationProtection.sources);
+          deferred.resolve(applicationProtection.data.applicationProtection);
         }
       }
     };
@@ -425,9 +428,9 @@ export default {
     return deferred.promise;
   },
   //
-  async createApplicationProtection (client, applicationId, fragments) {
+  async createApplicationProtection (client, applicationId, bail, fragments) {
     const deferred = Q.defer();
-    client.post('/application', createApplicationProtection(applicationId, fragments), responseHandler(deferred));
+    client.post('/application', createApplicationProtection(applicationId, bail, fragments), responseHandler(deferred));
     return deferred.promise;
   },
   //

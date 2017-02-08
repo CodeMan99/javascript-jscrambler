@@ -133,10 +133,13 @@ const getProtectionDefaultFragments = {
   applicationProtection: `
     _id,
     state,
+    bail,
     sources {
       filename,
       errorMessages {
         message,
+        line,
+        column,
         fatal
       }
     }
