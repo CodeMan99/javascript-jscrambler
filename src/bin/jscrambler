@@ -26,7 +26,7 @@ commander
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .option('-m, --source-maps <id>', 'Download source maps')
   .option('-O, --recommended-order', 'Use recommended order')
-  .option('-B, --bail', 'Cancel protection if any file contains errors')
+  .option('-W --werror', 'Cancel protection if any file contains errors')
   .parse(process.argv);
 
 var globSrc, filesSrc, config;
@@ -48,7 +48,7 @@ config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
 config.cwd = commander.cwd || config.cwd;
 config.useRecommendedOrder = commander.recommendedOrder || config.useRecommendedOrder;
-config.bail = commander.bail || config.bail;
+config.werror = commander.werror || config.werror;
 
 config = defaults(config, _config);
 
@@ -95,7 +95,7 @@ const {
   cwd,
   sourceMaps = false,
   useRecommendedOrder,
-  bail
+  werror
 } = config;
 
 const params = mergeAndParseParams(commander, config.params);
@@ -143,7 +143,7 @@ if (commander.sourceMaps) {
           cwd,
           sourceMaps,
           useRecommendedOrder,
-          bail
+          bail: werror
         });
     } catch (error) {
       console.error(error.message);
