@@ -22,7 +22,12 @@ export function zip (files, cwd) {
   // If it's already a zip file
   if (files.length === 1 && /^.*\.zip$/.test(files[0])) {
     hasFiles = true;
-    outputFileSync(temp.openSync({suffix: '.zip'}).path, readFileSync(files[0]));
+    const zip = new JSZip();
+    let zipFile = readFileSync(files[0]);
+    // @todo is it really necessary?
+    outputFileSync(temp.openSync({suffix: '.zip'}).path, zipFile);
+    zipFile = zip.load(zipFile);
+    deferred.resolve(zipFile);
   } else {
     const zip = new JSZip();
     for (let i = 0, l = files.length; i < l; ++i) {
