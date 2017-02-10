@@ -101,6 +101,7 @@ export default {
       applicationTypes,
       languageSpecifications,
       sourceMaps,
+      randomizationSeed,
       areSubscribersOrdered,
       useRecommendedOrder,
       bail
@@ -200,7 +201,7 @@ export default {
       errorHandler(updateApplicationRes);
     }
 
-    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId, bail);
+    const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId, undefined, bail, randomizationSeed);
     errorHandler(createApplicationProtectionRes);
 
     const protectionId = createApplicationProtectionRes.data.createApplicationProtection._id;
@@ -428,9 +429,9 @@ export default {
     return deferred.promise;
   },
   //
-  async createApplicationProtection (client, applicationId, bail, fragments) {
+  async createApplicationProtection (client, applicationId, fragments, bail, randomizationSeed) {
     const deferred = Q.defer();
-    client.post('/application', createApplicationProtection(applicationId, bail, fragments), responseHandler(deferred));
+    client.post('/application', createApplicationProtection(applicationId, fragments, bail, randomizationSeed), responseHandler(deferred));
     return deferred.promise;
   },
   //

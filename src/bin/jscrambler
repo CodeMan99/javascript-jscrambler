@@ -25,7 +25,8 @@ commander
   .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .option('-m, --source-maps <id>', 'Download source maps')
-  .option('-O, --recommended-order', 'Use recommended order')
+  .option('-R, --randomization-seed <seed>', 'Set randomization seed')
+  .option('--recommended-order', 'Use recommended order')
   .option('-W --werror', 'Cancel protection if any file contains errors')
   .parse(process.argv);
 
@@ -46,6 +47,7 @@ config.host = commander.host || config.host;
 config.port = commander.port || config.port;
 config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
+config.randomizationSeed = commander.randomizationSeed || config.randomizationSeed;
 config.cwd = commander.cwd || config.cwd;
 config.useRecommendedOrder = commander.recommendedOrder || config.useRecommendedOrder;
 config.werror = commander.werror || config.werror;
@@ -93,6 +95,7 @@ const {
   languageSpecifications,
   areSubscribersOrdered,
   cwd,
+  randomizationSeed,
   sourceMaps = false,
   useRecommendedOrder,
   werror
@@ -142,8 +145,9 @@ if (commander.sourceMaps) {
           areSubscribersOrdered,
           cwd,
           sourceMaps,
-          useRecommendedOrder,
-          bail: werror
+          bail: werror,
+          randomizationSeed,
+          useRecommendedOrder
         });
     } catch (error) {
       console.error(error.message);

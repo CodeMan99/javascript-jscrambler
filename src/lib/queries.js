@@ -50,7 +50,8 @@ const getApplicationProtectionsDefaultFragments = `
   _id,
   sources,
   parameters,
-  finishedAt
+  finishedAt,
+  randomizationSeed
 `;
 
 export function getApplicationProtections (applicationId, params, fragments = getApplicationProtectionsDefaultFragments) {
