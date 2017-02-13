@@ -276,7 +276,7 @@ export default {
   async pollProtection (client, applicationId, protectionId) {
     const deferred = Q.defer();
 
-    const poll = async() => {
+    const poll = async () => {
       const applicationProtection = await this.getApplicationProtection(client, applicationId, protectionId);
       if (applicationProtection.errors) {
         console.log('Error polling protection', applicationProtection.errors);
