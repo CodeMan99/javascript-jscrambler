@@ -221,7 +221,7 @@ export default {
       errors.forEach(e => console.error(`Non-fatal error: "${e.message}" in ${e.filename}`));
     } else if (bail && protection.state === 'errored') {
       errors.forEach(e => console.error(`Error: "${e.message}" in ${e.filename}${e.line ? `:${e.line}` : ''}`));
-      throw new Error('Parsing errors ocurred');
+      throw new Error('Protection failed');
     }
 
     const download = await this.downloadApplicationProtection(client, protectionId);
@@ -284,11 +284,13 @@ export default {
       } else {
         const state = applicationProtection.data.applicationProtection.state;
         const bail = applicationProtection.data.applicationProtection.bail;
-        if (state !== 'finished' && state !== 'errored') {
+        if (state !== 'finished' && state !== 'errored' && state !== 'canceled') {
           setTimeout(poll, 500);
         } else if (state === 'errored' && !bail) {
           const url = `https://app.jscrambler.com/app/${applicationId}/protections/${protectionId}`;
           deferred.reject(`Protection failed. For more information visit: ${url}`);
+        } else if (state === 'canceled') {
+          deferred.reject('Protection canceled by user');
         } else {
           deferred.resolve(applicationProtection.data.applicationProtection);
         }
