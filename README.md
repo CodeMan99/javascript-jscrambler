@@ -66,20 +66,24 @@ information can be found [here](https://docs.jscrambler.com/api/clients.html).
 ```bash
 npm install -g jscrambler
 ```
-    Usage: jscrambler [options] <file ...>
+```
+  Usage: jscrambler [options] <file ...>
 
   Options:
 
-    -h, --help                    output usage information
-    -V, --version                 output the version number
-    -a, --access-key <accessKey>  Access key
-    -c, --config <config>         JScrambler configuration options
-    -H, --host <host>             Hostname
-    -i, --application-id <id>     Application ID
-    -o, --output-dir <dir>        Output directory
-    -p, --port <port>             Port
-    -C, --cwd <dir>               Current Working Directory
-    -s, --secret-key <secretKey>  Secret key
+    -h, --help                       output usage information
+    -V, --version                    output the version number
+    -a, --access-key <accessKey>     Access key
+    -c, --config <config>            JScrambler configuration options
+    -H, --host <host>                Hostname
+    -i, --application-id <id>        Application ID
+    -o, --output-dir <dir>           Output directory
+    -p, --port <port>                Port
+    -C, --cwd <dir>                  Current Working Directory
+    -s, --secret-key <secretKey>     Secret key
+    -R, --randomization-seed <seed>  Set randomization seed
+    --recommended-order              Use recommended order
+```
 
 
 ### Required Fields
