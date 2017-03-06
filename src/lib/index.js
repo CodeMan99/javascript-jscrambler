@@ -226,7 +226,7 @@ export default {
 
     if (protection.deprecations) {
       protection.deprecations.forEach(deprecation => {
-        deprecation && console.warn(`Warning: ${deprecation} is deprecated`);
+        deprecation && console.warn(`Warning: Option ${deprecation} is deprecated`);
       });
     }
 
