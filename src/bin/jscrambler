@@ -27,6 +27,7 @@ commander
   .option('-m, --source-maps <id>', 'Download source maps')
   .option('-R, --randomization-seed <seed>', 'Set randomization seed')
   .option('--recommended-order', 'Use recommended order')
+  .option('-W --werror', 'Cancel protection if any file contains errors')
   .parse(process.argv);
 
 var globSrc, filesSrc, config;
@@ -49,6 +50,7 @@ config.applicationId = commander.applicationId || config.applicationId;
 config.randomizationSeed = commander.randomizationSeed || config.randomizationSeed;
 config.cwd = commander.cwd || config.cwd;
 config.useRecommendedOrder = commander.recommendedOrder || config.useRecommendedOrder;
+config.werror = commander.werror || config.werror;
 
 config = defaults(config, _config);
 
@@ -95,7 +97,8 @@ const {
   cwd,
   randomizationSeed,
   sourceMaps = false,
-  useRecommendedOrder
+  useRecommendedOrder,
+  werror
 } = config;
 
 const params = mergeAndParseParams(commander, config.params);
@@ -142,11 +145,12 @@ if (commander.sourceMaps) {
           areSubscribersOrdered,
           cwd,
           sourceMaps,
+          bail: werror,
           randomizationSeed,
           useRecommendedOrder
         });
     } catch (error) {
-      console.error(error);
+      console.error(error.message || error);
       process.exit(1);
     }
   })();
