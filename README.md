@@ -66,7 +66,8 @@ information can be found [here](https://docs.jscrambler.com/api/clients.html).
 ```bash
 npm install -g jscrambler
 ```
-    Usage: jscrambler [options] <file ...>
+```
+  Usage: jscrambler [options] <file ...>
 
   Options:
 
@@ -110,7 +111,7 @@ There are two possible types of errors:
     Protection failed
     ```
 
-* Errors while parsing annotations  (Annotations )
+* Errors parsing annotations  (Annotations )
    
     Code
     ``` javascript

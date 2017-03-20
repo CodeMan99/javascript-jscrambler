@@ -224,6 +224,12 @@ export default {
       throw new Error('Protection failed');
     }
 
+    if (protection.deprecations) {
+      protection.deprecations.forEach(deprecation => {
+        deprecation && console.warn(`Warning: Option ${deprecation} is deprecated`);
+      });
+    }
+
     const download = await this.downloadApplicationProtection(client, protectionId);
     errorHandler(download);
     unzip(download, filesDest || destCallback);
