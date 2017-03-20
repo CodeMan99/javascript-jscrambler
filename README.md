@@ -70,20 +70,72 @@ npm install -g jscrambler
 
   Options:
 
-    -h, --help                    output usage information
-    -V, --version                 output the version number
-    -a, --access-key <accessKey>  Access key
-    -c, --config <config>         JScrambler configuration options
-    -H, --host <host>             Hostname
-    -i, --application-id <id>     Application ID
-    -o, --output-dir <dir>        Output directory
-    -p, --port <port>             Port
-    -C, --cwd <dir>               Current Working Directory
-    -s, --secret-key <secretKey>  Secret key
+    -h, --help                       output usage information
+    -V, --version                    output the version number
+    -a, --access-key <accessKey>     Access key
+    -c, --config <config>            JScrambler configuration options
+    -H, --host <host>                Hostname
+    -i, --application-id <id>        Application ID
+    -o, --output-dir <dir>           Output directory
+    -p, --port <port>                Port
+    -C, --cwd <dir>                  Current Working Directory
+    -s, --secret-key <secretKey>     Secret key
+    -R, --randomization-seed <seed>  Set randomization seed
+    --recommended-order              Use recommended order
+    -W --werror                      Cancel protection if any file contains errors
+```
 
 
 ### Required Fields
 When making API requests you must pass valid secret and access keys, through the command line or by having a `.jscramblerrc` file. These keys are each 40 characters long, alpha numeric strings, and uppercase. You can find them in your jscramber web dashboard under `My Profile > API Credentials`. In the examples these are shortened to `AAAA` and `SSSS` for the sake of readability.
+
+### Flag -W / --werror
+
+Jscrambler by default will protect your application even if errors occurred in some of your files. For example: if your app have 5 files and 1 of them has syntax errors, Jscrambler will protect the files with no errors and keep the original content in the other one.
+
+With this flag, any error/warning will make the protection fail. 
+There are two possible types of errors:
+* Sintax errors
+
+    Code
+    ``` javascript
+    function a[] {
+      return 
+    }
+    ```
+
+    Output
+    ```
+    Error: "Unexpected token [" in test.js:1
+    Protection failed
+    ```
+
+* Errors while parsing annotations  (Annotations )
+   
+    Code
+    ``` javascript
+     //@jscrambler define __something
+    function test() {
+      return true;
+    }
+
+    test();
+
+    //@jscrambler [define xxxxx]
+    function test1() {
+      return false;
+    }
+
+    test1();
+    ```
+
+    Output
+    ```
+    Error: "[Annotation Error] Expected " " or [a-z]i but "_" found." in test.js:1
+    Error: "[Annotation Error] Expected " ", "define", "disable", "enable", "global", "order" or "target" but "[" found." in test.js:8
+    Error: "Parsing errors on annotations" in test.js
+    Protection failed
+    ```
 
 ### Output to a single file
 ```bash
