@@ -96,7 +96,7 @@ Jscrambler by default will protect your application even if errors occurred in s
 
 With this flag, any error/warning will make the protection fail. 
 There are two possible types of errors:
-* Sintax errors
+* Syntax errors
 
     Code
     ``` javascript
@@ -111,7 +111,7 @@ There are two possible types of errors:
     Protection failed
     ```
 
-* Errors parsing annotations  (Annotations )
+* Errors parsing jscrambler [code annotations](https://docs.jscrambler.com/code-annotations/overview.html)
    
     Code
     ``` javascript
