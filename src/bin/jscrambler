@@ -128,27 +128,31 @@ if (commander.sourceMaps) {
   // Go, go, go
   (async () => {
     try {
+      const protectAndDownloadOptions = {
+        keys: {
+          accessKey,
+          secretKey
+        },
+        host,
+        port,
+        applicationId,
+        filesSrc,
+        filesDest,
+        params,
+        applicationTypes,
+        languageSpecifications,
+        areSubscribersOrdered,
+        cwd,
+        sourceMaps,
+        randomizationSeed,
+        useRecommendedOrder
+      };
+
+      if (typeof werror !== 'undefined') {
+        protectAndDownloadOptions.bail = werror;
+      }
       await jScrambler
-        .protectAndDownload({
-          keys: {
-            accessKey,
-            secretKey
-          },
-          host,
-          port,
-          applicationId,
-          filesSrc,
-          filesDest,
-          params,
-          applicationTypes,
-          languageSpecifications,
-          areSubscribersOrdered,
-          cwd,
-          sourceMaps,
-          bail: werror,
-          randomizationSeed,
-          useRecommendedOrder
-        });
+        .protectAndDownload(protectAndDownloadOptions);
     } catch (error) {
       console.error(error.message || error);
       process.exit(1);
