@@ -39,6 +39,8 @@ import {
   unzip
 } from './zip';
 
+const debug = !!process.env.DEBUG;
+
 export default {
   Client: JScramblerClient,
   config,
@@ -140,7 +142,9 @@ export default {
         }
       }
 
+      debug && console.log('Creating zip with source files');
       const _zip = await zip(_filesSrc, cwd);
+      debug && console.log('Finished zip with source files');
 
       const removeSourceRes = await this.removeSourceFromApplication(client, '', applicationId);
       if (removeSourceRes.errors) {
@@ -156,13 +160,17 @@ export default {
         }
       }
 
+      debug && console.log('Adding sources to application');
+      let content = _zip.generate({
+        type: 'nodebuffer'
+      });
+      content = content.toString('base64');
       const addApplicationSourceRes = await this.addApplicationSource(client, applicationId, {
-        content: _zip.generate({
-          type: 'base64'
-        }),
+        content,
         filename: 'application.zip',
         extension: 'zip'
       });
+      debug && console.log('Finished adding sources to application');
       errorHandler(addApplicationSourceRes);
     }
 
@@ -197,15 +205,19 @@ export default {
 
     if ($set.parameters || $set.applicationTypes || $set.languageSpecifications ||
       typeof $set.areSubscribersOrdered !== 'undefined') {
+      debug && console.log('Updating parameters of protection');
       const updateApplicationRes = await this.updateApplication(client, $set);
+      debug && console.log('Finished updating parameters of protection');
       errorHandler(updateApplicationRes);
     }
 
+    debug && console.log('Creating Application Protection');
     const createApplicationProtectionRes = await this.createApplicationProtection(client, applicationId, undefined, bail, randomizationSeed);
     errorHandler(createApplicationProtectionRes);
 
     const protectionId = createApplicationProtectionRes.data.createApplicationProtection._id;
     const protection = await this.pollProtection(client, applicationId, protectionId);
+    debug && console.log('Finished protecting');
 
     const errors = [];
     protection.sources.forEach(s => {
@@ -230,9 +242,12 @@ export default {
       });
     }
 
+    debug && console.log('Downloading protection result');
     const download = await this.downloadApplicationProtection(client, protectionId);
     errorHandler(download);
+    debug && console.log('Unzipping files');
     unzip(download, filesDest || destCallback);
+    debug && console.log('Finished unzipping files');
     console.log(protectionId);
   },
 
