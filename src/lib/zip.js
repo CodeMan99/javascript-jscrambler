@@ -4,7 +4,7 @@ import size from 'lodash.size';
 import temp from 'temp';
 import JSZip from 'jszip';
 import {readFileSync, statSync, outputFileSync} from 'fs-extra';
-import {normalize, resolve, relative, join} from 'path';
+import {normalize, resolve, relative, join, isAbsolute} from 'path';
 import {defer} from 'q';
 import {inspect} from 'util';
 
@@ -86,6 +86,18 @@ export function zip (files, cwd) {
   return deferred.promise;
 }
 
+function isWinAbsolutePath (path) {
+  return isAbsolute(path) && /^([a-z]:)(.*)/i.test(path);
+}
+
+function parseWinAbsolutePath (_path) {
+  const [full, drv, path] = _path.match(/^([a-z]:)(.*)/i);
+  return {
+    drv,
+    path
+  };
+}
+
 export function unzip (zipFile, dest) {
   const zip = new JSZip(zipFile);
   const _size = size(zip.files);
@@ -103,7 +115,12 @@ export function unzip (zipFile, dest) {
         if (_size === 1 && lastDestChar !== '/' && lastDestChar !== '\\') {
           destPath = dest;
         } else {
-          destPath = join(dest, file);
+          let _file = file;
+          // Deal with win path join c:\dest\:c\src
+          if (isWinAbsolutePath(_file)) {
+            _file = parseWinAbsolutePath(_file).path;
+          }
+          destPath = join(dest, _file);
         }
         outputFileSync(destPath, buffer);
       }
