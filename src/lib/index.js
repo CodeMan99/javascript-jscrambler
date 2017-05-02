@@ -3,6 +3,7 @@ import 'babel-polyfill';
 import glob from 'glob';
 import path from 'path';
 import request from 'axios';
+import defaults from 'lodash.defaults';
 import Q from 'q';
 
 import config from './config';
@@ -36,6 +37,7 @@ import {
 } from './queries';
 import {
   zip,
+  zipSources,
   unzip
 } from './zip';
 
@@ -88,8 +90,10 @@ export default {
   // Jscrambler or if you're provided access to beta features of our product.
   //
   async protectAndDownload (configPathOrObject, destCallback) {
-    const config = typeof configPathOrObject === 'string' ?
+    const _config = typeof configPathOrObject === 'string' ?
       require(configPathOrObject) : configPathOrObject;
+
+    const finalConfig = defaults(_config, config);
 
     const {
       applicationId,
@@ -98,6 +102,8 @@ export default {
       keys,
       filesDest,
       filesSrc,
+      sources,
+      stream = true,
       cwd,
       params,
       applicationTypes,
@@ -107,7 +113,7 @@ export default {
       areSubscribersOrdered,
       useRecommendedOrder,
       bail
-    } = config;
+    } = finalConfig;
 
     const {
       accessKey,
@@ -129,6 +135,24 @@ export default {
       throw new Error('Required *filesDest* not provided');
     }
 
+    let content;
+
+    if (sources || (filesSrc && filesSrc.length)) {
+      const removeSourceRes = await this.removeSourceFromApplication(client, '', applicationId);
+      if (removeSourceRes.errors) {
+        // TODO Implement error codes or fix this is on the services
+        let hadNoSources = false;
+        removeSourceRes.errors.forEach(error => {
+          if (error.message === 'Application Source with the given ID does not exist') {
+            hadNoSources = true;
+          }
+        });
+        if (!hadNoSources) {
+          throw new Error(removeSourceRes.errors[0].message);
+        }
+      }
+    }
+
     if (filesSrc && filesSrc.length) {
       let _filesSrc = [];
       for (let i = 0, l = filesSrc.length; i < l; ++i) {
@@ -144,24 +168,9 @@ export default {
 
       debug && console.log('Creating zip with source files');
       const _zip = await zip(_filesSrc, cwd);
-      debug && console.log('Finished zip with source files');
-
-      const removeSourceRes = await this.removeSourceFromApplication(client, '', applicationId);
-      if (removeSourceRes.errors) {
-        // TODO Implement error codes or fix this is on the services
-        var hadNoSources = false;
-        removeSourceRes.errors.forEach(function (error) {
-          if (error.message === 'Application Source with the given ID does not exist') {
-            hadNoSources = true;
-          }
-        });
-        if (!hadNoSources) {
-          throw new Error(removeSourceRes.errors[0].message);
-        }
-      }
 
       debug && console.log('Adding sources to application');
-      let content = _zip.generate({
+      content = _zip.generate({
         type: 'nodebuffer'
       });
       content = content.toString('base64');
@@ -170,6 +179,22 @@ export default {
         filename: 'application.zip',
         extension: 'zip'
       });
+      debug && console.log('Finished adding sources to application');
+      errorHandler(addApplicationSourceRes);
+    } else if (sources) {
+      debug && console.log('Adding sources to application');
+      const _zip = await zipSources(sources);
+
+      content = _zip.generate({
+        type: 'nodebuffer'
+      });
+
+      const addApplicationSourceRes = await this.addApplicationSource(client, applicationId, {
+        content: content.toString('base64'),
+        filename: 'application.zip',
+        extension: 'zip'
+      });
+
       debug && console.log('Finished adding sources to application');
       errorHandler(addApplicationSourceRes);
     }
@@ -246,7 +271,7 @@ export default {
     const download = await this.downloadApplicationProtection(client, protectionId);
     errorHandler(download);
     debug && console.log('Unzipping files');
-    unzip(download, filesDest || destCallback);
+    unzip(download, filesDest || destCallback, stream);
     debug && console.log('Finished unzipping files');
     console.log(protectionId);
   },
@@ -256,6 +281,7 @@ export default {
       keys,
       host,
       port,
+      stream = true,
       filesDest,
       filesSrc,
       protectionId
@@ -291,7 +317,7 @@ export default {
     } catch (e) {
       errorHandler(e);
     }
-    unzip(download, filesDest || destCallback);
+    unzip(download, filesDest || destCallback, stream);
   },
 
   async pollProtection (client, applicationId, protectionId) {
