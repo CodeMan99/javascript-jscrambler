@@ -124,12 +124,15 @@ export default {
       host,
       port
     });
-    
+
     let filesSrc = finalConfig.filesSrc;
     let filesDest = finalConfig.filesDest;
-    
+
     if (sources) {
       filesSrc = undefined;
+    }
+
+    if (destCallback) {
       filesDest = undefined;
     }
 
