@@ -88,10 +88,13 @@ export function zip (files, cwd) {
 
 export function zipSources (sources) {
   const zipFile = new JSZip();
+  const fileNames = [];
   for (const source of sources) {
     zipFile.file(source.filename, source.content);
+    fileNames.push(source.filename);
   }
 
+  debug && console.log('Zipping files', inspect(fileNames));
   return Promise.resolve(zipFile);
 }
 
