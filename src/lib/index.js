@@ -100,8 +100,6 @@ export default {
       host,
       port,
       keys,
-      filesDest,
-      filesSrc,
       sources,
       stream = true,
       cwd,
@@ -126,6 +124,14 @@ export default {
       host,
       port
     });
+    
+    let filesSrc = finalConfig.filesSrc;
+    let filesDest = finalConfig.filesDest;
+    
+    if (sources) {
+      filesSrc = undefined;
+      filesDest = undefined;
+    }
 
     if (!applicationId) {
       throw new Error('Required *applicationId* not provided');
