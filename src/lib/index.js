@@ -166,14 +166,15 @@ export default {
         }
       }
 
-      debug && console.log('Creating zip with source files');
+      debug && console.log('Creating zip from source files');
       const _zip = await zip(_filesSrc, cwd);
 
-      debug && console.log('Adding sources to application');
       content = _zip.generate({
         type: 'nodebuffer'
       });
       content = content.toString('base64');
+
+      debug && console.log('Adding sources to application');
       const addApplicationSourceRes = await this.addApplicationSource(client, applicationId, {
         content,
         filename: 'application.zip',
@@ -182,15 +183,17 @@ export default {
       debug && console.log('Finished adding sources to application');
       errorHandler(addApplicationSourceRes);
     } else if (sources) {
-      debug && console.log('Adding sources to application');
+      debug && console.log('Creating zip from sources');
       const _zip = await zipSources(sources);
 
       content = _zip.generate({
         type: 'nodebuffer'
       });
+      content = content.toString('base64');
 
+      debug && console.log('Adding sources to application');
       const addApplicationSourceRes = await this.addApplicationSource(client, applicationId, {
-        content: content.toString('base64'),
+        content,
         filename: 'application.zip',
         extension: 'zip'
       });
