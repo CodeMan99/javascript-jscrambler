@@ -86,6 +86,18 @@ export function zip (files, cwd) {
   return deferred.promise;
 }
 
+export function zipSources (sources) {
+  const zipFile = new JSZip();
+  const fileNames = [];
+  for (const source of sources) {
+    zipFile.file(source.filename, source.content);
+    fileNames.push(source.filename);
+  }
+
+  debug && console.log('Zipping files', inspect(fileNames));
+  return Promise.resolve(zipFile);
+}
+
 function isWinAbsolutePath (path) {
   return isAbsolute(path) && /^([a-z]:)(.*)/i.test(path);
 }
@@ -98,17 +110,23 @@ function parseWinAbsolutePath (_path) {
   };
 }
 
-export function unzip (zipFile, dest) {
+export function unzip (zipFile, dest, stream = true) {
   const zip = new JSZip(zipFile);
   const _size = size(zip.files);
 
-  for (let file in zip.files) {
+  const results = [];
+
+  for (const file in zip.files) {
     if (!zip.files[file].options.dir) {
       const buffer = zip.file(file).asNodeBuffer();
 
       if (typeof dest === 'function') {
-        dest(buffer, file);
-      } else if (dest) {
+        if (stream) {
+          dest(buffer, file);
+        } else {
+          results.push({filename: file, content: buffer});
+        }
+      } else if (dest && typeof dest === 'string') {
         var destPath;
 
         const lastDestChar = dest[dest.length - 1];
@@ -125,5 +143,9 @@ export function unzip (zipFile, dest) {
         outputFileSync(destPath, buffer);
       }
     }
+  }
+
+  if (!stream) {
+    dest(results);
   }
 }
