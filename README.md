@@ -47,10 +47,7 @@ Here's an example of what your `.jscramblerrc` file should look like:
   "filesDest": "/path/to/destDir/",
   "params": [
     {
-      "name": "stringSplitting",
-      "options": {
-        "chunk": 1
-      }
+      "name": "stringSplitting"
     }
   ],
   "areSubscribersOrdered": false
@@ -182,17 +179,20 @@ jscrambler.protectAndDownload({
     '/path/to/src/*.js'
   ],
   filesDest: '/path/to/destDir/',
-  params: {
-    stringSplitting: {
-      chunk: 1
+  params: [  
+    {
+      'name': 'whitespaceRemoval'
+    },
+    {
+      'name': 'duplicateLiteralsRemoval'
     }
-  }
+  ]
 })
 .then(function () {
   console.log('All done!');
 })
-.catch(function () {
-  console.error('Something went wrong...');
+.catch(function (err) {
+  console.error(err);
 });
 ```
 
