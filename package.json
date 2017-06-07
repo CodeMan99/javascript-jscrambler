@@ -1,6 +1,6 @@
 {
   "name": "jscrambler",
-  "description": "JScrambler API client.",
+  "description": "Jscrambler API client.",
   "version": "1.1.7",
   "homepage": "https://github.com/jscrambler/javascript-jscrambler",
   "author": {
@@ -36,7 +36,6 @@
     "flavored-path": "0.0.8",
     "fs-extra": "^0.30.0",
     "glob": "^7.0.3",
-    "grunt-contrib-clean": "^0.7.0",
     "jszip": "^2.6.0",
     "lodash.assign": "^4.0.1",
     "lodash.clone": "^4.0.3",
