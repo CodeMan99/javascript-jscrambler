@@ -157,6 +157,17 @@ jscrambler -c config.json
 where `config.json` is an object optionally containing any of the JScrambler options listed [here](#jscrambler-options), using the structure described [in the RC configuration](#rc-config).
 
 
+### Enabling/disabling the recommended order
+```bash
+jscrambler --recommended-order false input1.js -o output/
+```
+
+To enable:
+```bash
+jscrambler --recommended-order true input1.js -o output/
+```
+
+
 ## API
 ```bash
 npm install jscrambler

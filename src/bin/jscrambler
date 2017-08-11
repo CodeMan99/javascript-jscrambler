@@ -49,7 +49,7 @@ config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
 config.randomizationSeed = commander.randomizationSeed || config.randomizationSeed;
 config.cwd = commander.cwd || config.cwd;
-config.useRecommendedOrder = (commander.recommendedOrder && commander.recommendedOrder !== 'false' ? true : false) || config.useRecommendedOrder;
+config.useRecommendedOrder = commander.recommendedOrder ? (commander.recommendedOrder !== 'false' ? true : false) : config.useRecommendedOrder;
 config.werror = commander.werror || config.werror;
 
 config = defaults(config, _config);
