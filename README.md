@@ -79,7 +79,7 @@ npm install -g jscrambler
     -C, --cwd <dir>                  Current Working Directory
     -s, --secret-key <secretKey>     Secret key
     -R, --randomization-seed <seed>  Set randomization seed
-    --recommended-order              Use recommended order
+    --recommended-order <bool>       Use recommended order
     -W --werror                      Cancel protection if any file contains errors
 ```
 
@@ -155,6 +155,17 @@ jscrambler -a AAAA -s SSSS -i APP_ID -o output/ "lib/**/*.js"
 jscrambler -c config.json
 ```
 where `config.json` is an object optionally containing any of the JScrambler options listed [here](#jscrambler-options), using the structure described [in the RC configuration](#rc-config).
+
+
+### Enabling/disabling the recommended order
+```bash
+jscrambler --recommended-order false input1.js -o output/
+```
+
+To enable:
+```bash
+jscrambler --recommended-order true input1.js -o output/
+```
 
 
 ## API
