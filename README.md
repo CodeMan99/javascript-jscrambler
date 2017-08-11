@@ -79,7 +79,7 @@ npm install -g jscrambler
     -C, --cwd <dir>                  Current Working Directory
     -s, --secret-key <secretKey>     Secret key
     -R, --randomization-seed <seed>  Set randomization seed
-    --recommended-order              Use recommended order
+    --recommended-order <bool>       Use recommended order
     -W --werror                      Cancel protection if any file contains errors
 ```
 

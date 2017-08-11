@@ -228,7 +228,7 @@ export default {
       $set.applicationTypes = applicationTypes;
     }
 
-    if (useRecommendedOrder) {
+    if (typeof useRecommendedOrder !== 'undefined') {
       $set.useRecommendedOrder = useRecommendedOrder;
     }
 
