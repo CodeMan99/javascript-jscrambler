@@ -94,6 +94,7 @@ const {
   filesDest,
   host,
   port,
+  protocol,
   applicationTypes,
   languageSpecifications,
   areSubscribersOrdered,
@@ -118,6 +119,7 @@ if (commander.sourceMaps) {
           },
           host,
           port,
+          protocol,
           filesDest,
           filesSrc,
           protectionId: commander.sourceMaps
@@ -138,6 +140,7 @@ if (commander.sourceMaps) {
         },
         host,
         port,
+        protocol,
         applicationId,
         filesSrc,
         filesDest,
