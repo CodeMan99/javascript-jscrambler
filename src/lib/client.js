@@ -90,7 +90,7 @@ JScramblerClient.prototype.request = function (method, path, params = {}, callba
   }
 
   // Format URL
-  var protocol = this.options.port === 443 ? 'https' : 'http';
+  var protocol = this.options.protocol || (this.options.port === 443 ? 'https' : 'http');
 
   var formatedUrl = url.format({
     hostname: this.options.host,
