@@ -76,7 +76,10 @@ npm install -g jscrambler
     -i, --application-id <id>        Application ID
     -o, --output-dir <dir>           Output directory
     -p, --port <port>                Port
+    --protocol <protocol>            Protocol (http or https)
     -C, --cwd <dir>                  Current Working Directory
+    -m, --source-maps <id>           Download source maps
+    -R, --randomization-seed <seed>  Set randomization seed
     -s, --secret-key <secretKey>     Secret key
     -R, --randomization-seed <seed>  Set randomization seed
     --recommended-order <bool>       Use recommended order
