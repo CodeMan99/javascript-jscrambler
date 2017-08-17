@@ -22,6 +22,7 @@ commander
   .option('-i, --application-id <id>', 'Application ID')
   .option('-o, --output-dir <dir>', 'Output directory')
   .option('-p, --port <port>', 'Port')
+  .option('--protocol <protocol>', 'Protocol (http or https)')
   .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .option('-m, --source-maps <id>', 'Download source maps')
@@ -45,6 +46,8 @@ config.accessKey = commander.accessKey || (config.keys ? config.keys.accessKey :
 config.secretKey = commander.secretKey || (config.keys ? config.keys.secretKey : void 0);
 config.host = commander.host || config.host;
 config.port = commander.port || config.port;
+config.port = parseInt(config.port);
+config.protocol = commander.protocol || config.protocol;
 config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
 config.randomizationSeed = commander.randomizationSeed || config.randomizationSeed;

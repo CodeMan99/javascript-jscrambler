@@ -99,6 +99,7 @@ export default {
       applicationId,
       host,
       port,
+      protocol,
       keys,
       sources,
       stream = true,
@@ -122,7 +123,8 @@ export default {
       accessKey,
       secretKey,
       host,
-      port
+      port,
+      protocol
     });
 
     let filesSrc = finalConfig.filesSrc;
@@ -293,6 +295,7 @@ export default {
       keys,
       host,
       port,
+      protocol,
       stream = true,
       filesDest,
       filesSrc,
@@ -308,7 +311,8 @@ export default {
       accessKey,
       secretKey,
       host,
-      port
+      port,
+      protocol
     });
 
     if (!filesDest && !destCallback) {
