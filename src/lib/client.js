@@ -1,9 +1,11 @@
 import clone from 'lodash.clone';
 import crypto from 'crypto';
 import defaults from 'lodash.defaults';
+import fs from 'fs';
 import keys from 'lodash.keys';
 import request from 'axios';
 import url from 'url';
+import https from 'https';
 
 import cfg from './config';
 import generateSignedParams from './generate-signed-params';
@@ -102,6 +104,14 @@ JScramblerClient.prototype.request = function (method, path, params = {}, callba
 
   if (!isJSON) {
     settings.responseType = 'arraybuffer';
+  }
+
+  // Internal CA
+  if (this.options.cafile) {
+    var agent = new https.Agent({
+      ca: fs.readFileSync(this.options.cafile)
+    });
+    settings.agent = agent;
   }
 
   var promise;
