@@ -100,7 +100,7 @@ export default {
       host,
       port,
       protocol,
-      ca,
+      cafile,
       keys,
       sources,
       stream = true,
@@ -126,7 +126,7 @@ export default {
       host,
       port,
       protocol,
-      ca
+      cafile
     });
 
     let filesSrc = finalConfig.filesSrc;
@@ -298,7 +298,7 @@ export default {
       host,
       port,
       protocol,
-      ca,
+      cafile,
       stream = true,
       filesDest,
       filesSrc,
@@ -316,7 +316,7 @@ export default {
       host,
       port,
       protocol,
-      ca
+      cafile
     });
 
     if (!filesDest && !destCallback) {

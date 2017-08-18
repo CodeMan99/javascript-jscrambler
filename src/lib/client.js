@@ -106,9 +106,9 @@ JScramblerClient.prototype.request = function (method, path, params = {}, callba
   }
 
   // Internal CA
-  if (this.options.ca) {
+  if (this.options.cafile) {
     var agent = new https.Agent({
-      ca: fs.readFileSync(this.options.ca)
+      ca: fs.readFileSync(this.options.cafile)
     });
     settings.agent = agent;
   }
