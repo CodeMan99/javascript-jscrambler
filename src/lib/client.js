@@ -5,6 +5,7 @@ import fs from 'fs';
 import keys from 'lodash.keys';
 import request from 'axios';
 import url from 'url';
+import https from 'https';
 
 import cfg from './config';
 import generateSignedParams from './generate-signed-params';
