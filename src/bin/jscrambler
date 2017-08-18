@@ -23,7 +23,7 @@ commander
   .option('-o, --output-dir <dir>', 'Output directory')
   .option('-p, --port <port>', 'Port')
   .option('--protocol <protocol>', 'Protocol (http or https)')
-  .option('--cafile <path>', 'Internal certificate authority')
+  .option('--cafile <file>', 'Internal certificate authority')
   .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .option('-m, --source-maps <id>', 'Download source maps')
