@@ -23,6 +23,7 @@ commander
   .option('-o, --output-dir <dir>', 'Output directory')
   .option('-p, --port <port>', 'Port')
   .option('--protocol <protocol>', 'Protocol (http or https)')
+  .option('--ca <path>', 'Internal certificate authority')
   .option('-C, --cwd <dir>', 'Current Working Directory')
   .option('-s, --secret-key <secretKey>', 'Secret key')
   .option('-m, --source-maps <id>', 'Download source maps')
@@ -48,6 +49,7 @@ config.host = commander.host || config.host;
 config.port = commander.port || config.port;
 config.port = parseInt(config.port);
 config.protocol = commander.protocol || config.protocol;
+config.ca = commander.ca || config.ca;
 config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
 config.randomizationSeed = commander.randomizationSeed || config.randomizationSeed;
@@ -95,6 +97,7 @@ const {
   host,
   port,
   protocol,
+  ca,
   applicationTypes,
   languageSpecifications,
   areSubscribersOrdered,
@@ -120,6 +123,7 @@ if (commander.sourceMaps) {
           host,
           port,
           protocol,
+          ca,
           filesDest,
           filesSrc,
           protectionId: commander.sourceMaps
@@ -141,6 +145,7 @@ if (commander.sourceMaps) {
         host,
         port,
         protocol,
+        ca,
         applicationId,
         filesSrc,
         filesDest,
