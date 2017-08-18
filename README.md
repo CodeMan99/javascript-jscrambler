@@ -77,7 +77,7 @@ npm install -g jscrambler
     -o, --output-dir <dir>           Output directory
     -p, --port <port>                Port
     --protocol <protocol>            Protocol (http or https)
-    --cafile <file>                  Internal certificate authority
+    --cafile <path>                  Internal certificate authority
     -C, --cwd <dir>                  Current Working Directory
     -m, --source-maps <id>           Download source maps
     -R, --randomization-seed <seed>  Set randomization seed
