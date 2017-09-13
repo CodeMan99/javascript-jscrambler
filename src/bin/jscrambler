@@ -30,6 +30,7 @@ commander
   .option('-R, --randomization-seed <seed>', 'Set randomization seed')
   .option('--recommended-order <bool>', 'Use recommended order')
   .option('-W --werror', 'Cancel protection if any file contains errors')
+  .option('--jscramblerVersion <version>', 'Jscrambler version')
   .parse(process.argv);
 
 var globSrc, filesSrc, config;
@@ -56,6 +57,7 @@ config.randomizationSeed = commander.randomizationSeed || config.randomizationSe
 config.cwd = commander.cwd || config.cwd;
 config.useRecommendedOrder = commander.recommendedOrder ? (commander.recommendedOrder !== 'false' ? true : false) : config.useRecommendedOrder;
 config.werror = commander.werror || config.werror;
+config.jscramblerVersion = commander.jscramblerVersion || config.jscramblerVersion;
 
 config = defaults(config, _config);
 
@@ -112,7 +114,8 @@ const {
   randomizationSeed,
   sourceMaps = false,
   useRecommendedOrder,
-  werror
+  werror,
+  jscramblerVersion
 } = config;
 
 const params = mergeAndParseParams(commander, config.params);
@@ -163,7 +166,8 @@ if (commander.sourceMaps) {
         cwd,
         sourceMaps,
         randomizationSeed,
-        useRecommendedOrder
+        useRecommendedOrder,
+        jscramblerVersion
       };
 
       if (typeof werror !== 'undefined') {
