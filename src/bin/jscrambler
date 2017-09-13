@@ -30,7 +30,7 @@ commander
   .option('-R, --randomization-seed <seed>', 'Set randomization seed')
   .option('--recommended-order <bool>', 'Use recommended order')
   .option('-W --werror', 'Cancel protection if any file contains errors')
-  .option('--jscramblerVersion <version>', 'Jscrambler version')
+  .option('--jscramblerVersion <version>', 'Use a specific Jscrambler version')
   .parse(process.argv);
 
 var globSrc, filesSrc, config;
@@ -58,6 +58,11 @@ config.cwd = commander.cwd || config.cwd;
 config.useRecommendedOrder = commander.recommendedOrder ? (commander.recommendedOrder !== 'false' ? true : false) : config.useRecommendedOrder;
 config.werror = commander.werror || config.werror;
 config.jscramblerVersion = commander.jscramblerVersion || config.jscramblerVersion;
+
+if (!/^\d+\.\d+$/.test(config.jscramblerVersion)) {
+  console.error('The Jscrambler version must be in the form of $major.$minor (e.g., 5.1)');
+  process.exit(1);
+}
 
 config = defaults(config, _config);
 
