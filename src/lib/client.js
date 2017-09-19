@@ -22,6 +22,7 @@ const debug = !!process.env.DEBUG;
  * @author José Magalhães (magalhas@gmail.com)
  * @license MIT <http://opensource.org/licenses/MIT>
  */
+
 function JScramblerClient (options) {
   // Sluggish hack for backwards compatibility
   if (options && !options.keys && (options.accessKey || options.secretKey)) {
@@ -36,6 +37,10 @@ function JScramblerClient (options) {
    * @member
    */
   this.options = defaults(options || {}, cfg);
+
+  if (this.options.jscramblerVersion) {
+    request.defaults.headers.common.jscramblerVersion = this.options.jscramblerVersion;
+  }
 }
 /**
  * Delete request.
@@ -64,7 +69,6 @@ JScramblerClient.prototype.get = function (path, params, callback, isJSON = true
  */
 JScramblerClient.prototype.request = function (method, path, params = {}, callback = null, isJSON = true) {
   var signedData;
-
   if (this.token) {
     params.token = this.token;
   } else {

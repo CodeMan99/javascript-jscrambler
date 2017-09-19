@@ -112,7 +112,8 @@ export default {
       randomizationSeed,
       areSubscribersOrdered,
       useRecommendedOrder,
-      bail
+      bail,
+      jscramblerVersion
     } = finalConfig;
 
     const {
@@ -126,7 +127,8 @@ export default {
       host,
       port,
       protocol,
-      cafile
+      cafile,
+      jscramblerVersion
     });
 
     let filesSrc = finalConfig.filesSrc;
