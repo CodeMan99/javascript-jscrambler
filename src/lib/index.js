@@ -292,6 +292,7 @@ export default {
     unzip(download, filesDest || destCallback, stream);
     debug && console.log('Finished unzipping files');
     console.log(protectionId);
+    return protectionId
   },
 
   async downloadSourceMaps (configs, destCallback) {
