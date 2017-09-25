@@ -113,17 +113,24 @@ const getApplicationsDefaultFragments = `
   protections,
   parameters
 `;
-
-export function getApplications (fragments = getApplicationsDefaultFragments) {
+/**
+ * Return all applications. You can use the optional params to limit the returned protections
+ * by the version and number of results
+ * @param {fragment} fragments GraphQL fragment
+ * @param {Array} params {{String}protectionsVersion, {Integer} protectionsNumber}
+ */
+export function getApplications (fragments = getApplicationsDefaultFragments, params) {
   return {
     query: `
-      query getApplications {
-        applications {
+      query getApplications($protectionsVersion:String, $protectionsLimit: Int) {
+        applications(protectionsVersion: $protectionsVersion, protectionsLimit: $protectionsLimit) {
           ${fragments}
         }
       }
     `,
-    params: '{}'
+    params: JSON.stringify({
+      ...params
+    })
   };
 }
 

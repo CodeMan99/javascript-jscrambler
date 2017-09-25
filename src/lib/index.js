@@ -291,7 +291,7 @@ export default {
     debug && console.log('Unzipping files');
     unzip(download, filesDest || destCallback, stream);
     debug && console.log('Finished unzipping files');
-    console.log(protectionId);
+    debug && console.log(protectionId);
   },
 
   async downloadSourceMaps (configs, destCallback) {
@@ -455,9 +455,9 @@ export default {
     return deferred.promise;
   },
   //
-  async getApplications (client, fragments) {
+  async getApplications (client, fragments, params) {
     const deferred = Q.defer();
-    client.get('/application', getApplications(fragments), responseHandler(deferred));
+    client.get('/application', getApplications(fragments, params), responseHandler(deferred));
     return deferred.promise;
   },
   //
