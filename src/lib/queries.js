@@ -8,18 +8,25 @@ const getApplicationDefaultFragments = `
     extension
   }
 `;
-
-export function getApplication (applicationId, fragments = getApplicationDefaultFragments) {
+/**
+ * Return one application by id.
+ * The options params argument can be used to filter protections by version and limit the number of protections returned.
+ * @param {String} id the application id
+ * @param {fragment} fragments GraphQL fragment
+ * @param {Array} params {{String}protectionsVersion, {Integer} protectionsNumber}
+ */
+export function getApplication (applicationId, fragments = getApplicationDefaultFragments, params) {
   return {
     query: `
-      query getApplication ($applicationId: String!) {
-        application(_id: $applicationId) {
+      query getApplication ($applicationId: String!, $protectionsVersion: String, $protectionsLimit: Int) {
+        application(_id: $applicationId, protectionsVersion: $protectionsVersion, protectionsLimit: $protectionsLimit) {
           ${fragments}
         }
       }
     `,
     params: JSON.stringify({
-      applicationId
+      applicationId,
+      ...params
     })
   };
 }
@@ -114,8 +121,8 @@ const getApplicationsDefaultFragments = `
   parameters
 `;
 /**
- * Return all applications. You can use the optional params to limit the returned protections
- * by the version and number of results
+ * Return all applications.
+ * The options params argument can be used to filter protections by version and limit the number of protections returned.
  * @param {fragment} fragments GraphQL fragment
  * @param {Array} params {{String}protectionsVersion, {Integer} protectionsNumber}
  */
