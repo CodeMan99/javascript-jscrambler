@@ -50,7 +50,8 @@ Here's an example of what your `.jscramblerrc` file should look like:
       "name": "stringSplitting"
     }
   ],
-  "areSubscribersOrdered": false
+  "areSubscribersOrdered": false,
+  "jscramblerVersion": "5.1"
 }
 ```
 
@@ -85,6 +86,7 @@ npm install -g jscrambler
     -R, --randomization-seed <seed>  Set randomization seed
     --recommended-order <bool>       Use recommended order
     -W --werror                      Cancel protection if any file contains errors
+    --jscramblerVersion <version>    Use a specific Jscrambler version
 ```
 
 
