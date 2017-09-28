@@ -413,9 +413,9 @@ export default {
     return deferred.promise;
   },
   //
-  async getApplication (client, applicationId, fragments) {
+  async getApplication (client, applicationId, fragments, params) {
     const deferred = Q.defer();
-    client.get('/application', getApplication(applicationId, fragments), responseHandler(deferred));
+    client.get('/application', getApplication(applicationId, fragments, params), responseHandler(deferred));
     return deferred.promise;
   },
   //
@@ -455,9 +455,9 @@ export default {
     return deferred.promise;
   },
   //
-  async getApplications (client, fragments) {
+  async getApplications (client, fragments, params) {
     const deferred = Q.defer();
-    client.get('/application', getApplications(fragments), responseHandler(deferred));
+    client.get('/application', getApplications(fragments, params), responseHandler(deferred));
     return deferred.promise;
   },
   //
