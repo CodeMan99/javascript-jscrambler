@@ -262,7 +262,9 @@ export default {
     const protection = await this.pollProtection(client, applicationId, protectionId);
     debug && console.log('Finished protecting');
 
-    const errors = [];
+    const errors = protection.errorMessage ?
+      [{message: protection.errorMessage}] :
+      [];
     protection.sources.forEach(s => {
       if (s.errorMessages && s.errorMessages.length > 0) {
         errors.push(...s.errorMessages.map(e => ({
@@ -275,13 +277,17 @@ export default {
     if (!bail && errors.length > 0) {
       errors.forEach(e => console.error(`Non-fatal error: "${e.message}" in ${e.filename}`));
     } else if (bail && protection.state === 'errored') {
-      errors.forEach(e => console.error(`Error: "${e.message}" in ${e.filename}${e.line ? `:${e.line}` : ''}`));
+      errors.forEach(e => console.error(`Error: "${e.message}"${e.filename ?`in ${e.filename}${e.line ? `:${e.line}` : ''}`: ''}`));
       throw new Error('Protection failed');
     }
 
     if (protection.deprecations) {
       protection.deprecations.forEach(deprecation => {
-        deprecation && console.warn(`Warning: Option ${deprecation} is deprecated`);
+        if (deprecation.type === 'Transformation') {
+          console.warn(`Warning: ${deprecation.type} ${deprecation.entity} is no longer maintained. Please consider removing it from your configuration.`);
+        } else {
+          console.warn(`Warning: ${deprecation.type} ${deprecation.entity} is deprecated.`);
+        }
       });
     }
 
@@ -566,12 +572,12 @@ function responseHandler (deferred) {
 function errorHandler (res) {
   if (res.errors && res.errors.length) {
     res.errors.forEach(function (error) {
-      throw new Error(error.message);
+      throw new Error(`Error: ${error.message}`);
     });
   }
 
   if (res.message) {
-    throw new Error(res.message);
+    throw new Error(`Error: ${res.message}`);
   }
 
   return res;
