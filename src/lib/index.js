@@ -41,6 +41,8 @@ import {
   unzip
 } from './zip';
 
+import getProtectionDefaultFragments from './get-protection-default-fragments';
+
 const debug = !!process.env.DEBUG;
 
 export default {
@@ -259,7 +261,12 @@ export default {
     errorHandler(createApplicationProtectionRes);
 
     const protectionId = createApplicationProtectionRes.data.createApplicationProtection._id;
-    const protection = await this.pollProtection(client, applicationId, protectionId);
+    const protection = await this.pollProtection(
+      client,
+      applicationId,
+      protectionId,
+      getProtectionDefaultFragments[jscramblerVersion]
+    );
     debug && console.log('Finished protecting');
 
     const errors = protection.errorMessage ?
@@ -349,14 +356,14 @@ export default {
     unzip(download, filesDest || destCallback, stream);
   },
 
-  async pollProtection (client, applicationId, protectionId) {
+  async pollProtection (client, applicationId, protectionId, fragments) {
     const deferred = Q.defer();
 
     const poll = async () => {
-      const applicationProtection = await this.getApplicationProtection(client, applicationId, protectionId);
+      const applicationProtection = await this.getApplicationProtection(client, applicationId, protectionId, fragments);
       if (applicationProtection.errors) {
         console.log('Error polling protection', applicationProtection.errors);
-        throw new Error('Error polling protection');
+        deferred.reject(`Protection failed. For more information visit: ${url}`);
       } else {
         const state = applicationProtection.data.applicationProtection.state;
         const bail = applicationProtection.data.applicationProtection.bail;
