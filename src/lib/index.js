@@ -361,6 +361,7 @@ export default {
 
     const poll = async () => {
       const applicationProtection = await this.getApplicationProtection(client, applicationId, protectionId, fragments);
+      const url = `https://app.jscrambler.com/app/${applicationId}/protections/${protectionId}`;
       if (applicationProtection.errors) {
         console.log('Error polling protection', applicationProtection.errors);
         deferred.reject(`Protection failed. For more information visit: ${url}`);
@@ -370,7 +371,6 @@ export default {
         if (state !== 'finished' && state !== 'errored' && state !== 'canceled') {
           setTimeout(poll, 500);
         } else if (state === 'errored' && !bail) {
-          const url = `https://app.jscrambler.com/app/${applicationId}/protections/${protectionId}`;
           deferred.reject(`Protection failed. For more information visit: ${url}`);
         } else if (state === 'canceled') {
           deferred.reject('Protection canceled by user');
