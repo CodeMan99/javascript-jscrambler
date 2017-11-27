@@ -31,9 +31,10 @@ commander
   .option('--recommended-order <bool>', 'Use recommended order')
   .option('-W --werror', 'Cancel protection if any file contains errors')
   .option('--jscramblerVersion <version>', 'Use a specific Jscrambler version')
+  .option('--debugMode', 'Protect in debug mode')
   .parse(process.argv);
 
-var globSrc, filesSrc, config;
+let globSrc, filesSrc, config;
 
 // If -c, --config file was provided
 if (commander.config) {
@@ -44,8 +45,10 @@ if (commander.config) {
   config = {};
 }
 
-config.accessKey = commander.accessKey || (config.keys ? config.keys.accessKey : void 0);
-config.secretKey = commander.secretKey || (config.keys ? config.keys.secretKey : void 0);
+config.accessKey =
+  commander.accessKey || (config.keys ? config.keys.accessKey : void 0);
+config.secretKey =
+  commander.secretKey || (config.keys ? config.keys.secretKey : void 0);
 config.host = commander.host || config.host;
 config.port = commander.port || config.port;
 config.port = config.port && parseInt(config.port);
@@ -53,14 +56,21 @@ config.protocol = commander.protocol || config.protocol;
 config.cafile = commander.cafile || config.cafile;
 config.filesDest = commander.outputDir || config.filesDest;
 config.applicationId = commander.applicationId || config.applicationId;
-config.randomizationSeed = commander.randomizationSeed || config.randomizationSeed;
+config.randomizationSeed =
+  commander.randomizationSeed || config.randomizationSeed;
 config.cwd = commander.cwd || config.cwd;
-config.useRecommendedOrder = commander.recommendedOrder ? (commander.recommendedOrder !== 'false' ? true : false) : config.useRecommendedOrder;
+config.useRecommendedOrder = commander.recommendedOrder
+  ? commander.recommendedOrder !== 'false'
+  : config.useRecommendedOrder;
 config.werror = commander.werror || config.werror;
-config.jscramblerVersion = commander.jscramblerVersion || config.jscramblerVersion;
+config.jscramblerVersion =
+  commander.jscramblerVersion || config.jscramblerVersion;
+config.debugMode = commander.debugMode || config.debugMode;
 
 if (config.jscramblerVersion && !/^\d+\.\d+$/.test(config.jscramblerVersion)) {
-  console.error('The Jscrambler version must be in the form of $major.$minor (e.g., 5.1)');
+  console.error(
+    'The Jscrambler version must be in the form of $major.$minor (e.g. 5.1)'
+  );
   process.exit(1);
 }
 
@@ -81,7 +91,9 @@ if (globSrc && globSrc.length) {
 
     // If the user is providing a zip alongside more files
     if (path.extname(globSrc[i]) === '.zip' && globSrc.length > 1) {
-      console.error('Please either provide a zip file containing all your source files or use the minimatch syntax');
+      console.error(
+        'Please either provide a zip file containing all your source files or use the minimatch syntax'
+      );
       process.exit(1);
     }
 
@@ -91,7 +103,9 @@ if (globSrc && globSrc.length) {
 
     if (debug) {
       if (tmpGlob.length === 0) {
-        console.log(`Pattern "${globSrc[i]}" doesn't match any files. Will be ignored.`);
+        console.log(
+          `Pattern "${globSrc[i]}" doesn't match any files. Will be ignored.`
+        );
       } else {
         console.log(`Pattern "${globSrc[i]}" matched the following files:`);
         tmpGlob.forEach(file => {
@@ -120,7 +134,8 @@ const {
   sourceMaps = false,
   useRecommendedOrder,
   werror,
-  jscramblerVersion
+  jscramblerVersion,
+  debugMode
 } = config;
 
 const params = mergeAndParseParams(commander, config.params);
@@ -129,20 +144,19 @@ if (commander.sourceMaps) {
   // Go, go, go download
   (async () => {
     try {
-      await jScrambler
-        .downloadSourceMaps({
-          keys: {
-            accessKey,
-            secretKey
-          },
-          host,
-          port,
-          protocol,
-          cafile,
-          filesDest,
-          filesSrc,
-          protectionId: commander.sourceMaps
-        });
+      await jScrambler.downloadSourceMaps({
+        keys: {
+          accessKey,
+          secretKey
+        },
+        host,
+        port,
+        protocol,
+        cafile,
+        filesDest,
+        filesSrc,
+        protectionId: commander.sourceMaps
+      });
     } catch (error) {
       console.error(error);
       process.exit(1);
@@ -172,14 +186,14 @@ if (commander.sourceMaps) {
         sourceMaps,
         randomizationSeed,
         useRecommendedOrder,
-        jscramblerVersion
+        jscramblerVersion,
+        debugMode
       };
 
       if (typeof werror !== 'undefined') {
         protectAndDownloadOptions.bail = werror;
       }
-      await jScrambler
-        .protectAndDownload(protectAndDownloadOptions);
+      await jScrambler.protectAndDownload(protectAndDownloadOptions);
     } catch (error) {
       console.error(error.message || error);
       process.exit(1);

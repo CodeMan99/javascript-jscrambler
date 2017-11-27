@@ -327,12 +327,13 @@ export function createApplicationProtection(
   applicationId,
   fragments = createProtectionDefaultFragments,
   bail = false,
-  randomizationSeed
+  randomizationSeed,
+  debugMode
 ) {
   return {
     query: `
-      mutation createApplicationProtection ($applicationId: String!, $bail: Boolean, $randomizationSeed: String) {
-        createApplicationProtection (applicationId: $applicationId, bail: $bail, randomizationSeed: $randomizationSeed) {
+      mutation createApplicationProtection ($applicationId: String!, $bail: Boolean, $randomizationSeed: String, $debugMode: Boolean) {
+        createApplicationProtection (applicationId: $applicationId, bail: $bail, randomizationSeed: $randomizationSeed, debugMode: $debugMode) {
           ${fragments}
         }
       }
@@ -340,7 +341,8 @@ export function createApplicationProtection(
     params: {
       applicationId,
       bail,
-      randomizationSeed
+      randomizationSeed,
+      debugMode
     }
   };
 }

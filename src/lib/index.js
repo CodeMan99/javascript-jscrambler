@@ -278,7 +278,8 @@ export default {
       applicationId,
       undefined,
       bail,
-      randomizationSeed
+      randomizationSeed,
+      debugMode
     );
     errorHandler(createApplicationProtectionRes);
 
@@ -659,7 +660,8 @@ export default {
     applicationId,
     fragments,
     bail,
-    randomizationSeed
+    randomizationSeed,
+    debugMode
   ) {
     const deferred = Q.defer();
     client.post(
@@ -668,7 +670,8 @@ export default {
         applicationId,
         fragments,
         bail,
-        randomizationSeed
+        randomizationSeed,
+        debugMode
       ),
       responseHandler(deferred)
     );
