@@ -331,7 +331,7 @@ export function createApplicationProtection(
 ) {
   return {
     query: `
-      mutation createApplicationProtection ($applicationId: String!, $bail: Boolean, $randomizationSeed: String, $debugMode: Boolean) {
+      mutation createApplicationProtection ($applicationId: String!, $bail: Boolean, $randomizationSeed: String) {
         createApplicationProtection (applicationId: $applicationId, bail: $bail, randomizationSeed: $randomizationSeed) {
           ${fragments}
         }

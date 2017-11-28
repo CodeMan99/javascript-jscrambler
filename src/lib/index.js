@@ -113,7 +113,8 @@ export default {
       areSubscribersOrdered,
       useRecommendedOrder,
       bail,
-      jscramblerVersion
+      jscramblerVersion,
+      debugMode
     } = finalConfig;
 
     const {accessKey, secretKey} = keys;
@@ -232,7 +233,8 @@ export default {
     }
 
     const $set = {
-      _id: applicationId
+      _id: applicationId,
+      debugMode: debugMode || false
     };
 
     if (params && Object.keys(params).length) {
@@ -278,8 +280,7 @@ export default {
       applicationId,
       undefined,
       bail,
-      randomizationSeed,
-      debugMode
+      randomizationSeed
     );
     errorHandler(createApplicationProtectionRes);
 
@@ -660,8 +661,7 @@ export default {
     applicationId,
     fragments,
     bail,
-    randomizationSeed,
-    debugMode
+    randomizationSeed
   ) {
     const deferred = Q.defer();
     client.post(
@@ -670,8 +670,7 @@ export default {
         applicationId,
         fragments,
         bail,
-        randomizationSeed,
-        debugMode
+        randomizationSeed
       ),
       responseHandler(deferred)
     );
