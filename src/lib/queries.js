@@ -15,7 +15,11 @@ const getApplicationDefaultFragments = `
  * @param {fragment} fragments GraphQL fragment
  * @param {Array} params {{String}protectionsVersion, {Integer} protectionsNumber}
  */
-export function getApplication (applicationId, fragments = getApplicationDefaultFragments, params) {
+export function getApplication(
+  applicationId,
+  fragments = getApplicationDefaultFragments,
+  params
+) {
   return {
     query: `
       query getApplication ($applicationId: String!, $protectionsVersion: String, $protectionsLimit: Int) {
@@ -37,7 +41,11 @@ const getApplicationSourceDefaultFragments = `
   extension
 `;
 
-export function getApplicationSource (sourceId, fragments = getApplicationSourceDefaultFragments, limits) {
+export function getApplicationSource(
+  sourceId,
+  fragments = getApplicationSourceDefaultFragments,
+  limits
+) {
   return {
     query: `
       query getApplicationSource ($sourceId: String!, $contentLimit: Int, $transformedLimit: Int) {
@@ -61,7 +69,11 @@ const getApplicationProtectionsDefaultFragments = `
   randomizationSeed
 `;
 
-export function getApplicationProtections (applicationId, params, fragments = getApplicationProtectionsDefaultFragments) {
+export function getApplicationProtections(
+  applicationId,
+  params,
+  fragments = getApplicationProtectionsDefaultFragments
+) {
   return {
     query: `
       query getApplicationProtections ($applicationId: String!, $sort: String, $order: String, $limit: Int, $page: Int) {
@@ -81,7 +93,10 @@ const getApplicationProtectionsCountDefaultFragments = `
   count
 `;
 
-export function getApplicationProtectionsCount (applicationId, fragments = getApplicationProtectionsCountDefaultFragments) {
+export function getApplicationProtectionsCount(
+  applicationId,
+  fragments = getApplicationProtectionsCountDefaultFragments
+) {
   return {
     query: `
       query getApplicationProtectionsCount ($applicationId: String!) {
@@ -101,7 +116,7 @@ const getTemplatesDefaultFragments = `
   parameters
 `;
 
-export function getTemplates (fragments = getTemplatesDefaultFragments) {
+export function getTemplates(fragments = getTemplatesDefaultFragments) {
   return {
     query: `
       query getTemplates {
@@ -126,7 +141,10 @@ const getApplicationsDefaultFragments = `
  * @param {fragment} fragments GraphQL fragment
  * @param {Array} params {{String}protectionsVersion, {Integer} protectionsNumber}
  */
-export function getApplications (fragments = getApplicationsDefaultFragments, params) {
+export function getApplications(
+  fragments = getApplicationsDefaultFragments,
+  params
+) {
   return {
     query: `
       query getApplications($protectionsVersion:String, $protectionsLimit: Int) {
@@ -163,7 +181,11 @@ const getProtectionDefaultFragments = {
   `
 };
 
-export function getProtection (applicationId, protectionId, fragments = getProtectionDefaultFragments) {
+export function getProtection(
+  applicationId,
+  protectionId,
+  fragments = getProtectionDefaultFragments
+) {
   return {
     query: `
       query getProtection ($applicationId: String!, $protectionId: String!) {

@@ -10,11 +10,11 @@ import {inspect} from 'util';
 
 const debug = !!process.env.DEBUG;
 
-export function zip (files, cwd) {
+export function zip(files, cwd) {
   debug && console.log('Zipping files', inspect(files));
   const deferred = defer();
   // Flag to detect if any file was added to the zip archive
-  var hasFiles = false;
+  let hasFiles = false;
   // Sanitize `cwd`
   if (cwd) {
     cwd = normalize(cwd);
@@ -53,18 +53,16 @@ export function zip (files, cwd) {
       if (files[i].contents) {
         name = relative(files[i].cwd, files[i].path);
         buffer = files[i].contents;
-      }
-      // Else if it's a path and not a directory
-      else if (!statSync(sPath).isDirectory()) {
+      } else if (!statSync(sPath).isDirectory()) {
+        // Else if it's a path and not a directory
         if (cwd && files[i].indexOf && files[i].indexOf(cwd) === 0) {
           name = files[i].substring(cwd.length);
         } else {
           name = files[i];
         }
         buffer = readFileSync(sPath);
-      }
-      // Else if it's a directory path
-      else {
+      } else {
+        // Else if it's a directory path
         zip.folder(sPath);
       }
       if (name) {
@@ -73,20 +71,24 @@ export function zip (files, cwd) {
       }
     }
     if (hasFiles) {
-      var tempFile = temp.openSync({suffix: '.zip'});
-      outputFileSync(tempFile.path, zip.generate({type: 'nodebuffer'}), {encoding: 'base64'});
+      const tempFile = temp.openSync({suffix: '.zip'});
+      outputFileSync(tempFile.path, zip.generate({type: 'nodebuffer'}), {
+        encoding: 'base64'
+      });
       files[0] = tempFile.path;
       files.length = 1;
       deferred.resolve(zip);
     } else {
-      throw new Error('No source files found. If you intend to send a whole directory sufix your path with "**" (e.g. ./my-directory/**)');
+      throw new Error(
+        'No source files found. If you intend to send a whole directory sufix your path with "**" (e.g. ./my-directory/**)'
+      );
     }
   }
 
   return deferred.promise;
 }
 
-export function zipSources (sources) {
+export function zipSources(sources) {
   const zipFile = new JSZip();
   const fileNames = [];
   for (const source of sources) {
@@ -98,11 +100,11 @@ export function zipSources (sources) {
   return Promise.resolve(zipFile);
 }
 
-function isWinAbsolutePath (path) {
+function isWinAbsolutePath(path) {
   return isAbsolute(path) && /^([a-z]:)(.*)/i.test(path);
 }
 
-function parseWinAbsolutePath (_path) {
+function parseWinAbsolutePath(_path) {
   const [full, drv, path] = _path.match(/^([a-z]:)(.*)/i);
   return {
     drv,
@@ -110,7 +112,7 @@ function parseWinAbsolutePath (_path) {
   };
 }
 
-export function unzip (zipFile, dest, stream = true) {
+export function unzip(zipFile, dest, stream = true) {
   const zip = new JSZip(zipFile);
   const _size = size(zip.files);
 

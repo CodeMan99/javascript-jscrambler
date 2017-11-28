@@ -1,21 +1,24 @@
-module.exports = function (grunt) {
+module.exports = function(grunt) {
   grunt.initConfig({
     babel: {
       options: {
         sourceMap: 'inline'
       },
       dist: {
-        files: [{
+        files: [
+          {
             expand: true,
             cwd: 'src/lib',
             src: '**/*.js',
             dest: 'dist/lib'
-        }, {
+          },
+          {
             expand: true,
             cwd: 'src/bin',
             src: '**/*',
             dest: 'dist/bin'
-        }]
+          }
+        ]
       }
     },
     clean: {
@@ -45,8 +48,8 @@ module.exports = function (grunt) {
       },
       build: {
         files: 'src/**/*',
-        tasks:  ['build']
-      },
+        tasks: ['build']
+      }
     }
   });
 
