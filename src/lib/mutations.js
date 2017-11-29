@@ -4,7 +4,10 @@ const createApplicationDefaultFragments = `
   name
 `;
 
-export function createApplication (data, fragments = createApplicationDefaultFragments) {
+export function createApplication(
+  data,
+  fragments = createApplicationDefaultFragments
+) {
   return {
     query: `
       mutation createApplication ($data: ApplicationCreate!) {
@@ -23,7 +26,10 @@ const duplicateApplicationDefaultFragments = `
   _id
 `;
 
-export function duplicateApplication (id, fragments = duplicateApplicationDefaultFragments) {
+export function duplicateApplication(
+  id,
+  fragments = duplicateApplicationDefaultFragments
+) {
   return {
     query: `
       mutation duplicateApplication ($_id: String!) {
@@ -42,7 +48,10 @@ const removeApplicationDefaultFragments = `
   _id
 `;
 
-export function removeApplication (id, fragments = removeApplicationDefaultFragments) {
+export function removeApplication(
+  id,
+  fragments = removeApplicationDefaultFragments
+) {
   return {
     query: `
       mutation removeApplication ($_id: String!) {
@@ -61,7 +70,11 @@ const removeProtectionDefaultFragments = `
   _id
 `;
 
-export function removeProtection (id, appId, fragments = removeProtectionDefaultFragments) {
+export function removeProtection(
+  id,
+  appId,
+  fragments = removeProtectionDefaultFragments
+) {
   return {
     query: `
       mutation removeProtection ($_id: String!, $applicationId: String!) {
@@ -81,7 +94,11 @@ const cancelProtectionDefaultFragments = `
   _id
 `;
 
-export function cancelProtection (id, appId, fragments = cancelProtectionDefaultFragments) {
+export function cancelProtection(
+  id,
+  appId,
+  fragments = cancelProtectionDefaultFragments
+) {
   return {
     query: `
       mutation cancelProtection ($_id: String!, $applicationId: String!) {
@@ -103,7 +120,10 @@ const updateApplicationDefaultFragments = `
   name
 `;
 
-export function updateApplication (application, fragments = updateApplicationDefaultFragments) {
+export function updateApplication(
+  application,
+  fragments = updateApplicationDefaultFragments
+) {
   const applicationId = application._id;
   delete application._id;
 
@@ -128,7 +148,10 @@ const unlockApplicationDefaultFragments = `
   name
 `;
 
-export function unlockApplication (application, fragments = unlockApplicationDefaultFragments) {
+export function unlockApplication(
+  application,
+  fragments = unlockApplicationDefaultFragments
+) {
   return {
     query: `
       mutation unlockApplication ($applicationId: String!) {
@@ -149,7 +172,11 @@ const addApplicationSourceDefaultFragments = `
   extension
 `;
 
-export function addApplicationSource (applicationId, data, fragments = addApplicationSourceDefaultFragments) {
+export function addApplicationSource(
+  applicationId,
+  data,
+  fragments = addApplicationSourceDefaultFragments
+) {
   return {
     query: `
       mutation addSourceToApplication ($applicationId: String!, $data: ApplicationSourceCreate!) {
@@ -171,7 +198,10 @@ const updateApplicationSourceDefaultFragments = `
   extension
 `;
 
-export function updateApplicationSource (applicationSource, fragments = updateApplicationSourceDefaultFragments) {
+export function updateApplicationSource(
+  applicationSource,
+  fragments = updateApplicationSourceDefaultFragments
+) {
   const sourceId = applicationSource._id;
   delete applicationSource._id;
 
@@ -184,7 +214,7 @@ export function updateApplicationSource (applicationSource, fragments = updateAp
       }
     `,
     params: {
-      sourceId: sourceId,
+      sourceId,
       data: applicationSource
     }
   };
@@ -197,7 +227,11 @@ const removeSourceFromApplicationDefaultFragments = `
   }
 `;
 
-export function removeSourceFromApplication (filename, applicationId, fragments = removeSourceFromApplicationDefaultFragments) {
+export function removeSourceFromApplication(
+  filename,
+  applicationId,
+  fragments = removeSourceFromApplicationDefaultFragments
+) {
   return {
     query: `
       mutation removeSource ($filename: String!, $applicationId: String!) {
@@ -220,7 +254,10 @@ const createTemplateDefaultFragments = `
   parameters
 `;
 
-export function createTemplate (template, fragments = createTemplateDefaultFragments) {
+export function createTemplate(
+  template,
+  fragments = createTemplateDefaultFragments
+) {
   return {
     query: `
       mutation createTemplate ($data: TemplateInput!) {
@@ -239,7 +276,7 @@ const removeTemplateDefaultFragments = `
   _id
 `;
 
-export function removeTemplate (id, fragments = removeTemplateDefaultFragments) {
+export function removeTemplate(id, fragments = removeTemplateDefaultFragments) {
   return {
     query: `
       mutation removeTemplate ($_id: String!) {
@@ -259,7 +296,10 @@ const updateTemplateDefaultFragments = `
   parameters
 `;
 
-export function updateTemplate (template, fragments = updateTemplateDefaultFragments) {
+export function updateTemplate(
+  template,
+  fragments = updateTemplateDefaultFragments
+) {
   const templateId = template._id;
   delete template._id;
 
@@ -283,7 +323,12 @@ const createProtectionDefaultFragments = `
   state
 `;
 
-export function createApplicationProtection (applicationId, fragments = createProtectionDefaultFragments, bail = false, randomizationSeed) {
+export function createApplicationProtection(
+  applicationId,
+  fragments = createProtectionDefaultFragments,
+  bail = false,
+  randomizationSeed
+) {
   return {
     query: `
       mutation createApplicationProtection ($applicationId: String!, $bail: Boolean, $randomizationSeed: String) {
@@ -293,9 +338,9 @@ export function createApplicationProtection (applicationId, fragments = createPr
       }
     `,
     params: {
-      applicationId: applicationId,
-      bail: bail,
-      randomizationSeed: randomizationSeed
+      applicationId,
+      bail,
+      randomizationSeed
     }
   };
 }
@@ -305,7 +350,11 @@ const applyTemplateDefaultFragments = `
   parameters
 `;
 
-export function applyTemplate (templateId, appId, fragments = applyTemplateDefaultFragments) {
+export function applyTemplate(
+  templateId,
+  appId,
+  fragments = applyTemplateDefaultFragments
+) {
   return {
     query: `
       mutation applyTemplate ($templateId: String!, $appId: String!) {

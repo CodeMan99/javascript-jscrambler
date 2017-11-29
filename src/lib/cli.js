@@ -37,12 +37,12 @@ const isBoolFlag = {
 };
 
 // Convert from command line option format to JScrambler API format.
-export function mergeAndParseParams (commander, params) {
+export function mergeAndParseParams(commander, params) {
   params = clone(params || {});
 
-  for (let name in isBoolFlag) {
+  for (const name in isBoolFlag) {
     if (commander[name] !== undefined) {
-      let snakeCaseName = snakeCase(name);
+      const snakeCaseName = snakeCase(name);
       if (isBoolFlag[name] === true) {
         params[snakeCaseName] = {
           status: 1
