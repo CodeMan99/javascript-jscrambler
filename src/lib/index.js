@@ -113,7 +113,8 @@ export default {
       areSubscribersOrdered,
       useRecommendedOrder,
       bail,
-      jscramblerVersion
+      jscramblerVersion,
+      debugMode
     } = finalConfig;
 
     const {accessKey, secretKey} = keys;
@@ -232,7 +233,8 @@ export default {
     }
 
     const $set = {
-      _id: applicationId
+      _id: applicationId,
+      debugMode: debugMode || false
     };
 
     if (params && Object.keys(params).length) {
