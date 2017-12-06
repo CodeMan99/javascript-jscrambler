@@ -238,7 +238,7 @@ export default {
     };
 
     if (params && Object.keys(params).length) {
-      $set.parameters = JSON.stringify(normalizeParameters(params));
+      $set.parameters = normalizeParameters(params);
       $set.areSubscribersOrdered = Array.isArray(params);
     }
 
@@ -259,7 +259,7 @@ export default {
     }
 
     if (typeof sourceMaps !== undefined) {
-      $set.sourceMaps = JSON.stringify(sourceMaps);
+      $set.sourceMaps = sourceMaps;
     }
 
     if (
@@ -664,13 +664,22 @@ export default {
     randomizationSeed
   ) {
     const deferred = Q.defer();
+    const protectionOptions = {};
+
+    if (typeof bail !== 'undefined') {
+      protectionOptions.bail = bail;
+    }
+
+    if (typeof randomizationSeed !== 'undefined') {
+      protectionOptions.randomizationSeed = randomizationSeed;
+    }
+
     client.post(
       '/application',
       createApplicationProtection(
         applicationId,
         fragments,
-        bail,
-        randomizationSeed
+        protectionOptions
       ),
       responseHandler(deferred)
     );
