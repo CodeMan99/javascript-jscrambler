@@ -24,7 +24,7 @@ export function zip(files, cwd) {
     hasFiles = true;
     const zip = new JSZip();
     let zipFile = readFileSync(files[0]);
-    // @todo is it really necessary?
+
     outputFileSync(temp.openSync({suffix: '.zip'}).path, zipFile);
     zipFile = zip.load(zipFile);
     deferred.resolve(zipFile);
@@ -90,13 +90,14 @@ export function zip(files, cwd) {
 
 export function zipSources(sources) {
   const zipFile = new JSZip();
-  const fileNames = [];
-  for (const source of sources) {
+  const fileNames = sources.map(source => {
     zipFile.file(source.filename, source.content);
-    fileNames.push(source.filename);
-  }
+    return source.filename;
+  });
 
-  debug && console.log('Zipping files', inspect(fileNames));
+  if (debug) {
+    console.log('Zipping files', inspect(fileNames));
+  }
   return Promise.resolve(zipFile);
 }
 

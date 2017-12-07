@@ -1,21 +1,20 @@
 #!/usr/bin/env node
 
-import 'babel-polyfill';
-
 import commander from 'commander';
 import defaults from 'lodash.defaults';
 import glob from 'glob';
 import path from 'path';
 
-import _config from '../lib/config';
-import jScrambler from '../lib';
-import {mergeAndParseParams} from '../lib/cli';
+import _config from '../config';
+import jscrambler from '../';
+import {mergeAndParseParams} from '../cli';
 
 const debug = !!process.env.DEBUG;
 
 commander
   .version(require('../../package.json').version)
   .usage('[options] <file ...>')
+  .option('-v, --version')
   .option('-a, --access-key <accessKey>', 'Access key')
   .option('-c, --config <config>', 'JScrambler configuration options')
   .option('-H, --host <host>', 'Hostname')
@@ -46,9 +45,9 @@ if (commander.config) {
 }
 
 config.accessKey =
-  commander.accessKey || (config.keys ? config.keys.accessKey : void 0);
+  commander.accessKey || (config.keys ? config.keys.accessKey : undefined);
 config.secretKey =
-  commander.secretKey || (config.keys ? config.keys.secretKey : void 0);
+  commander.secretKey || (config.keys ? config.keys.secretKey : undefined);
 config.host = commander.host || config.host;
 config.port = commander.port || config.port;
 config.port = config.port && parseInt(config.port);
@@ -85,14 +84,14 @@ if (commander.args.length > 0) {
 if (globSrc && globSrc.length) {
   filesSrc = [];
   // Iterate `globSrc` to build a list of source files into `filesSrc`
-  for (let i = 0, l = globSrc.length; i < l; ++i) {
+  for (let i = 0, l = globSrc.length; i < l; i += 1) {
     // Calling sync `glob` because async is pointless for the CLI use case
     // (as of now at least)
 
     // If the user is providing a zip alongside more files
     if (path.extname(globSrc[i]) === '.zip' && globSrc.length > 1) {
       console.error(
-        'Please either provide a zip file containing all your source files or use the minimatch syntax'
+        'Please provide either a zip file containing all your source files or use the minimatch syntax'
       );
       process.exit(1);
     }
@@ -144,7 +143,7 @@ if (commander.sourceMaps) {
   // Go, go, go download
   (async () => {
     try {
-      await jScrambler.downloadSourceMaps({
+      await jscrambler.downloadSourceMaps({
         keys: {
           accessKey,
           secretKey
@@ -165,37 +164,36 @@ if (commander.sourceMaps) {
 } else {
   // Go, go, go
   (async () => {
+    const protectAndDownloadOptions = {
+      keys: {
+        accessKey,
+        secretKey
+      },
+      host,
+      port,
+      protocol,
+      cafile,
+      applicationId,
+      filesSrc,
+      filesDest,
+      params,
+      applicationTypes,
+      languageSpecifications,
+      areSubscribersOrdered,
+      cwd,
+      sourceMaps,
+      randomizationSeed,
+      useRecommendedOrder,
+      jscramblerVersion,
+      debugMode
+    };
     try {
-      const protectAndDownloadOptions = {
-        keys: {
-          accessKey,
-          secretKey
-        },
-        host,
-        port,
-        protocol,
-        cafile,
-        applicationId,
-        filesSrc,
-        filesDest,
-        params,
-        applicationTypes,
-        languageSpecifications,
-        areSubscribersOrdered,
-        cwd,
-        sourceMaps,
-        randomizationSeed,
-        useRecommendedOrder,
-        jscramblerVersion,
-        debugMode
-      };
-
       if (typeof werror !== 'undefined') {
         protectAndDownloadOptions.bail = werror;
       }
-      await jScrambler.protectAndDownload(protectAndDownloadOptions);
+      await jscrambler.protectAndDownload(protectAndDownloadOptions);
     } catch (error) {
-      console.error(error.message || error);
+      console.error(debug ? error : error.message || error);
       process.exit(1);
     }
   })();

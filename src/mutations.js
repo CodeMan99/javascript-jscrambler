@@ -326,8 +326,28 @@ const createProtectionDefaultFragments = `
 export function createApplicationProtection(
   applicationId,
   fragments = createProtectionDefaultFragments,
-  options
+  options,
+  args
 ) {
+  if (!args.some(f => f.name === 'options')) {
+    const {bail, randomizationSeed} = options;
+
+    return {
+      query: `
+      mutation createApplicationProtection ($applicationId: String!, $bail: Boolean, $randomizationSeed: String) {
+        createApplicationProtection (applicationId: $applicationId, bail: $bail, randomizationSeed: $randomizationSeed) {
+          ${fragments}
+        }
+      }
+    `,
+      params: {
+        applicationId,
+        bail,
+        randomizationSeed
+      }
+    };
+  }
+
   return {
     query: `
       mutation createApplicationProtection ($applicationId: String!, $options: JSON) {

@@ -8,41 +8,57 @@ import Q from 'q';
 
 import config from './config';
 import generateSignedParams from './generate-signed-params';
-import JScramblerClient from './client';
-import {
-  addApplicationSource,
-  createApplication,
-  removeApplication,
-  updateApplication,
-  updateApplicationSource,
-  removeSourceFromApplication,
-  createTemplate,
-  removeTemplate,
-  updateTemplate,
-  createApplicationProtection,
-  removeProtection,
-  cancelProtection,
-  duplicateApplication,
-  unlockApplication,
-  applyTemplate
-} from './mutations';
-import {
-  getApplication,
-  getApplicationProtections,
-  getApplicationProtectionsCount,
-  getApplications,
-  getApplicationSource,
-  getTemplates,
-  getProtection
-} from './queries';
+import JscramblerClient from './client';
+import * as mutations from './mutations';
+import * as queries from './queries';
 import {zip, zipSources, unzip} from './zip';
+import * as introspection from './introspection';
 
 import getProtectionDefaultFragments from './get-protection-default-fragments';
 
+const {intoObjectType} = introspection;
+
 const debug = !!process.env.DEBUG;
 
+function errorHandler(res) {
+  if (res.errors && res.errors.length) {
+    res.errors.forEach(error => {
+      throw new Error(`Error: ${error.message}`);
+    });
+  }
+
+  if (res.data && res.data.errors) {
+    res.data.errors.forEach(e => console.error(e.message));
+    throw new Error('GraphQL Query Error');
+  }
+
+  if (res.message) {
+    throw new Error(`Error: ${res.message}`);
+  }
+
+  return res;
+}
+
+function normalizeParameters(parameters) {
+  let result;
+
+  if (!Array.isArray(parameters)) {
+    result = [];
+    Object.keys(parameters).forEach(name => {
+      result.push({
+        name,
+        options: parameters[name]
+      });
+    });
+  } else {
+    result = parameters;
+  }
+
+  return result;
+}
+
 export default {
-  Client: JScramblerClient,
+  Client: JscramblerClient,
   config,
   generateSignedParams,
   // This method is a shortcut method that accepts an object with everything needed
@@ -148,8 +164,6 @@ export default {
       throw new Error('Required *filesDest* not provided');
     }
 
-    let content;
-
     if (sources || (filesSrc && filesSrc.length)) {
       const removeSourceRes = await this.removeSourceFromApplication(
         client,
@@ -173,9 +187,11 @@ export default {
       }
     }
 
+    let zipped;
+
     if (filesSrc && filesSrc.length) {
       let _filesSrc = [];
-      for (let i = 0, l = filesSrc.length; i < l; ++i) {
+      for (let i = 0, l = filesSrc.length; i < l; i += 1) {
         if (typeof filesSrc[i] === 'string') {
           // TODO Replace `glob.sync` with async version
           _filesSrc = _filesSrc.concat(
@@ -188,99 +204,101 @@ export default {
         }
       }
 
-      debug && console.log('Creating zip from source files');
-      const _zip = await zip(_filesSrc, cwd);
+      if (debug) {
+        console.log('Creating zip from source files');
+      }
 
-      content = _zip.generate({
-        type: 'nodebuffer'
-      });
-      content = content.toString('base64');
-
-      debug && console.log('Adding sources to application');
-      const addApplicationSourceRes = await this.addApplicationSource(
-        client,
-        applicationId,
-        {
-          content,
-          filename: 'application.zip',
-          extension: 'zip'
-        }
-      );
-      debug && console.log('Finished adding sources to application');
-      errorHandler(addApplicationSourceRes);
+      zipped = await zip(_filesSrc, cwd);
     } else if (sources) {
-      debug && console.log('Creating zip from sources');
-      const _zip = await zipSources(sources);
+      if (debug) {
+        console.log('Creating zip from sources');
+      }
 
-      content = _zip.generate({
-        type: 'nodebuffer'
-      });
-      content = content.toString('base64');
-
-      debug && console.log('Adding sources to application');
-      const addApplicationSourceRes = await this.addApplicationSource(
-        client,
-        applicationId,
-        {
-          content,
-          filename: 'application.zip',
-          extension: 'zip'
-        }
-      );
-
-      debug && console.log('Finished adding sources to application');
-      errorHandler(addApplicationSourceRes);
+      zipped = await zipSources(sources);
     }
 
-    const $set = {
+    if (zipped) {
+      const content = zipped
+        .generate({
+          type: 'nodebuffer'
+        })
+        .toString('base64');
+
+      if (debug) {
+        console.log('Adding sources to application');
+      }
+
+      await this.addApplicationSource(client, applicationId, {
+        content,
+        filename: 'application.zip',
+        extension: 'zip'
+      });
+    }
+
+    const updateData = {
       _id: applicationId,
-      debugMode: debugMode || false
+      debugMode: !!debugMode
     };
 
     if (params && Object.keys(params).length) {
-      $set.parameters = normalizeParameters(params);
-      $set.areSubscribersOrdered = Array.isArray(params);
+      updateData.parameters = normalizeParameters(params);
+      updateData.areSubscribersOrdered = Array.isArray(params);
     }
 
     if (typeof areSubscribersOrdered !== 'undefined') {
-      $set.areSubscribersOrdered = areSubscribersOrdered;
+      updateData.areSubscribersOrdered = areSubscribersOrdered;
     }
 
     if (applicationTypes) {
-      $set.applicationTypes = applicationTypes;
+      updateData.applicationTypes = applicationTypes;
     }
 
     if (typeof useRecommendedOrder !== 'undefined') {
-      $set.useRecommendedOrder = useRecommendedOrder;
+      updateData.useRecommendedOrder = useRecommendedOrder;
     }
 
     if (languageSpecifications) {
-      $set.languageSpecifications = languageSpecifications;
+      updateData.languageSpecifications = languageSpecifications;
     }
 
-    if (typeof sourceMaps !== undefined) {
-      $set.sourceMaps = sourceMaps;
+    if (typeof sourceMaps !== 'undefined') {
+      updateData.sourceMaps = sourceMaps;
     }
 
     if (
-      $set.parameters ||
-      $set.applicationTypes ||
-      $set.languageSpecifications ||
-      typeof $set.areSubscribersOrdered !== 'undefined'
+      updateData.parameters ||
+      updateData.applicationTypes ||
+      updateData.languageSpecifications ||
+      typeof updateData.areSubscribersOrdered !== 'undefined'
     ) {
-      debug && console.log('Updating parameters of protection');
-      const updateApplicationRes = await this.updateApplication(client, $set);
-      debug && console.log('Finished updating parameters of protection');
+      if (debug) {
+        console.log('Updating parameters of protection');
+      }
+
+      const applicationUpdate = await intoObjectType(
+        client,
+        updateData,
+        'Application'
+      );
+      const updateApplicationRes = await this.updateApplication(
+        client,
+        applicationUpdate
+      );
+      if (debug) {
+        console.log('Finished updating parameters of protection');
+        console.error(updateApplicationRes);
+      }
       errorHandler(updateApplicationRes);
     }
 
-    debug && console.log('Creating Application Protection');
+    if (debug) {
+      console.log('Creating Application Protection');
+    }
+
     const createApplicationProtectionRes = await this.createApplicationProtection(
       client,
       applicationId,
-      undefined,
-      bail,
-      randomizationSeed
+      {bail, randomizationSeed}
     );
     errorHandler(createApplicationProtectionRes);
 
@@ -292,7 +310,10 @@ export default {
       protectionId,
       getProtectionDefaultFragments[jscramblerVersion]
     );
-    debug && console.log('Finished protecting');
+
+    if (debug) {
+      console.log('Finished protecting');
+    }
 
     const errors = protection.errorMessage
       ? [{message: protection.errorMessage}]
@@ -337,16 +358,28 @@ export default {
       });
     }
 
-    debug && console.log('Downloading protection result');
+    if (debug) {
+      console.log('Downloading protection result');
+    }
     const download = await this.downloadApplicationProtection(
       client,
       protectionId
     );
+
     errorHandler(download);
-    debug && console.log('Unzipping files');
+
+    if (debug) {
+      console.log('Unzipping files');
+    }
+
     unzip(download, filesDest || destCallback, stream);
-    debug && console.log('Finished unzipping files');
+
+    if (debug) {
+      console.log('Finished unzipping files');
+    }
+
     console.log(protectionId);
+
     return protectionId;
   },
 
@@ -397,8 +430,6 @@ export default {
   },
 
   async pollProtection(client, applicationId, protectionId, fragments) {
-    const deferred = Q.defer();
-
     const poll = async () => {
       const applicationProtection = await this.getApplicationProtection(
         client,
@@ -409,7 +440,8 @@ export default {
       const url = `https://app.jscrambler.com/app/${applicationId}/protections/${protectionId}`;
       if (applicationProtection.errors) {
         console.log('Error polling protection', applicationProtection.errors);
-        deferred.reject(
+
+        throw new Error(
           `Protection failed. For more information visit: ${url}`
         );
       } else {
@@ -420,168 +452,116 @@ export default {
           state !== 'errored' &&
           state !== 'canceled'
         ) {
-          setTimeout(poll, 500);
+          await new Promise(resolve => setTimeout(resolve, 500));
+          return poll();
         } else if (state === 'errored' && !bail) {
-          deferred.reject(
+          throw new Error(
             `Protection failed. For more information visit: ${url}`
           );
         } else if (state === 'canceled') {
-          deferred.reject('Protection canceled by user');
+          throw new Error('Protection canceled by user');
         } else {
-          deferred.resolve(applicationProtection.data.applicationProtection);
+          return applicationProtection.data.applicationProtection;
         }
       }
     };
 
-    poll();
-
-    return deferred.promise;
+    return poll();
   },
   //
   async createApplication(client, data, fragments) {
-    const deferred = Q.defer();
-    client.post(
+    return client.post(
       '/application',
-      createApplication(data, fragments),
-      responseHandler(deferred)
+      mutations.createApplication(data, fragments)
     );
-    return deferred.promise;
   },
   //
   async duplicateApplication(client, data, fragments) {
-    const deferred = Q.defer();
-    client.post(
+    return client.post(
       '/application',
-      duplicateApplication(data, fragments),
-      responseHandler(deferred)
+      mutations.duplicateApplication(data, fragments)
     );
-    return deferred.promise;
   },
   //
   async removeApplication(client, id) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      removeApplication(id),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    return client.post('/application', mutations.removeApplication(id));
   },
   //
   async removeProtection(client, id, appId, fragments) {
-    const deferred = Q.defer();
-    client.post(
+    return client.post(
       '/application',
-      removeProtection(id, appId, fragments),
-      responseHandler(deferred)
+      mutations.removeProtection(id, appId, fragments)
     );
-    return deferred.promise;
   },
   //
   async cancelProtection(client, id, appId, fragments) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      cancelProtection(id, appId, fragments),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    const mutation = await mutations.cancelProtection(id, appId, fragments);
+    return client.post('/application', mutation);
   },
   //
   async updateApplication(client, application, fragments) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      updateApplication(application, fragments),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    const mutation = await mutations.updateApplication(application, fragments);
+    return client.post('/application', mutation);
   },
   //
   async unlockApplication(client, application, fragments) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      unlockApplication(application, fragments),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    const mutation = await mutations.unlockApplication(application, fragments);
+    return client.post('/application', mutation);
   },
   //
   async getApplication(client, applicationId, fragments, params) {
-    const deferred = Q.defer();
-    client.get(
-      '/application',
-      getApplication(applicationId, fragments, params),
-      responseHandler(deferred)
+    const query = await queries.getApplication(
+      applicationId,
+      fragments,
+      params
     );
-    return deferred.promise;
+    return client.get('/application', query);
   },
   //
   async getApplicationSource(client, sourceId, fragments, limits) {
-    const deferred = Q.defer();
-    client.get(
-      '/application',
-      getApplicationSource(sourceId, fragments, limits),
-      responseHandler(deferred)
+    const query = await queries.getApplicationSource(
+      sourceId,
+      fragments,
+      limits
     );
-    return deferred.promise;
+    return client.get('/application', query);
   },
   //
   async getApplicationProtections(client, applicationId, params, fragments) {
-    const deferred = Q.defer();
-    client.get(
-      '/application',
-      getApplicationProtections(applicationId, params, fragments),
-      responseHandler(deferred)
+    const query = await queries.getApplicationProtections(
+      applicationId,
+      params,
+      fragments
     );
-    return deferred.promise;
+    return client.get('/application', query);
   },
   //
   async getApplicationProtectionsCount(client, applicationId, fragments) {
-    const deferred = Q.defer();
-    client.get(
-      '/application',
-      getApplicationProtectionsCount(applicationId, fragments),
-      responseHandler(deferred)
+    const query = await queries.getApplicationProtectionsCount(
+      applicationId,
+      fragments
     );
-    return deferred.promise;
+    return client.get('/application', query);
   },
   //
   async createTemplate(client, template, fragments) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      createTemplate(template, fragments),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    const mutation = await mutations.createTemplate(template, fragments);
+    return client.post('/application', mutation);
   },
   //
   async removeTemplate(client, id) {
-    const deferred = Q.defer();
-    client.post('/application', removeTemplate(id), responseHandler(deferred));
-    return deferred.promise;
+    const mutation = await mutations.removeTemplate(id);
+    return client.post('/application', mutation);
   },
   //
   async getTemplates(client, fragments) {
-    const deferred = Q.defer();
-    client.get(
-      '/application',
-      getTemplates(fragments),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    const query = await queries.getTemplates(fragments);
+    return client.get('/application', query);
   },
   //
   async getApplications(client, fragments, params) {
-    const deferred = Q.defer();
-    client.get(
-      '/application',
-      getApplications(fragments, params),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    const query = await queries.getApplications(fragments, params);
+    return client.get('/application', query);
   },
   //
   async addApplicationSource(
@@ -590,35 +570,31 @@ export default {
     applicationSource,
     fragments
   ) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      addApplicationSource(applicationId, applicationSource, fragments),
-      responseHandler(deferred)
+    const mutation = await mutations.addApplicationSource(
+      applicationId,
+      applicationSource,
+      fragments
     );
-    return deferred.promise;
+    return client.post('/application', mutation);
   },
   //
   async addApplicationSourceFromURL(client, applicationId, url, fragments) {
-    const deferred = Q.defer();
-    return getFileFromUrl(client, url).then(file => {
-      client.post(
-        '/application',
-        addApplicationSource(applicationId, file, fragments),
-        responseHandler(deferred)
-      );
-      return deferred.promise;
-    });
+    const file = await getFileFromUrl(client, url);
+    const mutation = await mutations.addApplicationSource(
+      applicationId,
+      file,
+      fragments
+    );
+
+    return client.post('/application', mutation);
   },
   //
   async updateApplicationSource(client, applicationSource, fragments) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      updateApplicationSource(applicationSource, fragments),
-      responseHandler(deferred)
+    const mutation = await mutations.updateApplicationSource(
+      applicationSource,
+      fragments
     );
-    return deferred.promise;
+    return client.post('/application', mutation);
   },
   //
   async removeSourceFromApplication(
@@ -627,63 +603,46 @@ export default {
     applicationId,
     fragments
   ) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      removeSourceFromApplication(sourceId, applicationId, fragments),
-      responseHandler(deferred)
+    const mutation = await mutations.removeSourceFromApplication(
+      sourceId,
+      applicationId,
+      fragments
     );
-    return deferred.promise;
+    return client.post('/application', mutation);
   },
   //
   async applyTemplate(client, templateId, appId, fragments) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      applyTemplate(templateId, appId, fragments),
-      responseHandler(deferred)
+    const mutation = await mutations.applyTemplate(
+      templateId,
+      appId,
+      fragments
     );
-    return deferred.promise;
+    return client.post('/application', mutation);
   },
   //
   async updateTemplate(client, template, fragments) {
-    const deferred = Q.defer();
-    client.post(
-      '/application',
-      updateTemplate(template, fragments),
-      responseHandler(deferred)
-    );
-    return deferred.promise;
+    const mutation = await mutations.updateTemplate(template, fragments);
+    return client.post('/application', mutation);
   },
   //
   async createApplicationProtection(
     client,
     applicationId,
-    fragments,
-    bail,
-    randomizationSeed
+    protectionOptions
   ) {
-    const deferred = Q.defer();
-    const protectionOptions = {};
-
-    if (typeof bail !== 'undefined') {
-      protectionOptions.bail = bail;
-    }
-
-    if (typeof randomizationSeed !== 'undefined') {
-      protectionOptions.randomizationSeed = randomizationSeed;
-    }
-
-    client.post(
-      '/application',
-      createApplicationProtection(
-        applicationId,
-        fragments,
-        protectionOptions
-      ),
-      responseHandler(deferred)
+    const {args} = await introspection.mutation(
+      client,
+      'createApplicationProtection'
     );
-    return deferred.promise;
+
+    const mutation = await mutations.createApplicationProtection(
+      applicationId,
+      undefined,
+      protectionOptions,
+      args
+    );
+
+    return client.post('/application', mutation);
   },
   //
   async getApplicationProtection(
@@ -692,104 +651,27 @@ export default {
     protectionId,
     fragments
   ) {
-    const deferred = Q.defer();
-    client.get(
-      '/application',
-      getProtection(applicationId, protectionId, fragments),
-      responseHandler(deferred)
+    const query = await queries.getProtection(
+      applicationId,
+      protectionId,
+      fragments
     );
-    return deferred.promise;
+    return client.get('/application', query);
   },
   //
   async downloadSourceMapsRequest(client, protectionId) {
-    const deferred = Q.defer();
-    client.get(
-      `/application/sourceMaps/${protectionId}`,
-      null,
-      responseHandler(deferred),
-      false
-    );
-    return deferred.promise;
+    return client.get(`/application/sourceMaps/${protectionId}`, null, false);
   },
   //
   async downloadApplicationProtection(client, protectionId) {
-    const deferred = Q.defer();
-    client.get(
-      `/application/download/${protectionId}`,
-      null,
-      responseHandler(deferred),
-      false
-    );
-    return deferred.promise;
+    return client.get(`/application/download/${protectionId}`, null, false);
   }
 };
 
 function getFileFromUrl(client, url) {
-  const deferred = Q.defer();
-  let file;
-  request
-    .get(url)
-    .then(res => {
-      file = {
-        content: res.data,
-        filename: path.basename(url),
-        extension: path.extname(url).substr(1)
-      };
-      deferred.resolve(file);
-    })
-    .catch(err => {
-      deferred.reject(err);
-    });
-  return deferred.promise;
-}
-
-function responseHandler(deferred) {
-  return (err, res) => {
-    if (err) {
-      deferred.reject(err);
-    } else {
-      const body = res.data;
-      try {
-        if (res.status >= 400) {
-          deferred.reject(body);
-        } else {
-          deferred.resolve(body);
-        }
-      } catch (ex) {
-        deferred.reject(body);
-      }
-    }
-  };
-}
-
-function errorHandler(res) {
-  if (res.errors && res.errors.length) {
-    res.errors.forEach(error => {
-      throw new Error(`Error: ${error.message}`);
-    });
-  }
-
-  if (res.message) {
-    throw new Error(`Error: ${res.message}`);
-  }
-
-  return res;
-}
-
-function normalizeParameters(parameters) {
-  let result;
-
-  if (!Array.isArray(parameters)) {
-    result = [];
-    Object.keys(parameters).forEach(name => {
-      result.push({
-        name,
-        options: parameters[name]
-      });
-    });
-  } else {
-    result = parameters;
-  }
-
-  return result;
+  return request.get(url).then(res => ({
+    content: res.data,
+    filename: path.basename(url),
+    extension: path.extname(url).substr(1)
+  }));
 }
