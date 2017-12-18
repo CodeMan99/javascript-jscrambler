@@ -10,8 +10,6 @@ import https from 'https';
 import cfg from './config';
 import generateSignedParams from './generate-signed-params';
 
-const debug = !!process.env.DEBUG;
-
 /**
  * @class JScramblerClient
  * @param {Object} options
@@ -48,8 +46,8 @@ function JScramblerClient(options) {
  * @param {Object} params
  * @param {Callback} callback
  */
-JScramblerClient.prototype.delete = function(path, params, callback) {
-  return this.request('DELETE', path, params, callback);
+JScramblerClient.prototype.delete = function(path, params) {
+  return this.request('DELETE', path, params);
 };
 /**
  * Get request.
@@ -60,10 +58,9 @@ JScramblerClient.prototype.delete = function(path, params, callback) {
 JScramblerClient.prototype.get = function(
   path,
   params,
-  callback,
   isJSON = true
 ) {
-  return this.request('GET', path, params, callback, isJSON);
+  return this.request('GET', path, params, isJSON);
 };
 /**
  * HTTP request.
@@ -76,7 +73,6 @@ JScramblerClient.prototype.request = function(
   method,
   path,
   params = {},
-  callback = null,
   isJSON = true
 ) {
   let signedData;
@@ -123,8 +119,8 @@ JScramblerClient.prototype.request = function(
       protocol
     }) + path;
 
-  let data,
-    settings = {};
+  let data;
+  const settings = {};
 
   if (!isJSON) {
     settings.responseType = 'arraybuffer';
@@ -148,9 +144,13 @@ JScramblerClient.prototype.request = function(
     promise = request[method.toLowerCase()](formatedUrl, data, settings);
   }
 
-  return promise
-    .then(res => callback(null, res))
-    .catch(error => callback(error));
+  return promise.then(res => {
+    if (res.status >= 200 && res.status < 400) {
+      return res.data;
+    }
+
+    throw new Error(`Unexpected Response Code: ${res.status}`);
+  });
 };
 /**
  * Post request.
@@ -158,8 +158,8 @@ JScramblerClient.prototype.request = function(
  * @param {Object} params
  * @param {Callback} callback
  */
-JScramblerClient.prototype.post = function(path, params, callback) {
-  return this.request('POST', path, params, callback);
+JScramblerClient.prototype.post = function(path, params) {
+  return this.request('POST', path, params);
 };
 
 exports = module.exports = JScramblerClient;

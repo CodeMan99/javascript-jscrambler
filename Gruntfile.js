@@ -8,9 +8,9 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: 'src/lib',
+            cwd: 'src',
             src: '**/*.js',
-            dest: 'dist/lib'
+            dest: 'dist'
           },
           {
             expand: true,
@@ -28,9 +28,9 @@ module.exports = function(grunt) {
     copy: {
       main: {
         expand: true,
-        cwd: 'src/lib',
+        cwd: 'src',
         src: ['**/*', '!**/*.js'],
-        dest: 'dist/lib'
+        dest: 'dist'
       }
     },
     jasmine_node: {

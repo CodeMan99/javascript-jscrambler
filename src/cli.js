@@ -38,23 +38,23 @@ const isBoolFlag = {
 
 // Convert from command line option format to JScrambler API format.
 export function mergeAndParseParams(commander, params) {
-  params = clone(params || {});
+  const finalParams = clone(params || {});
 
-  for (const name in isBoolFlag) {
+  Object.keys(isBoolFlag).forEach(name => {
     if (commander[name] !== undefined) {
       const snakeCaseName = snakeCase(name);
       if (isBoolFlag[name] === true) {
-        params[snakeCaseName] = {
+        finalParams[snakeCaseName] = {
           status: 1
         };
       } else {
-        params[snakeCaseName] = commander[name];
+        finalParams[snakeCaseName] = commander[name];
       }
-      if (typeof params[snakeCaseName].status === 'undefined') {
-        params[snakeCaseName].status = 1;
+      if (typeof finalParams[snakeCaseName].status === 'undefined') {
+        finalParams[snakeCaseName].status = 1;
       }
     }
-  }
+  });
 
-  return params;
+  return finalParams;
 }

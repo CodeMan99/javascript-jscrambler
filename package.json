@@ -21,17 +21,17 @@
     }
   ],
   "scripts": {
-    "build": "grunt build && chmod +x dist/bin/jscrambler",
+    "clean": "rm -rf ./dist",
+    "build": "babel src --out-dir dist",
     "test": "grunt test 2> /dev/null",
     "watch": "grunt watch",
     "prepublish": "npm run build"
   },
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 6.10.0"
   },
   "dependencies": {
     "axios": "^0.13.1",
-    "babel-polyfill": "^6.9.1",
     "commander": "^2.8.1",
     "flavored-path": "0.0.8",
     "fs-extra": "^0.30.0",
@@ -39,6 +39,7 @@
     "jszip": "^2.6.0",
     "lodash.assign": "^4.0.1",
     "lodash.clone": "^4.0.3",
+    "lodash.clonedeep": "^4.5.0",
     "lodash.defaults": "^4.0.1",
     "lodash.keys": "^4.0.1",
     "lodash.omit": "^4.3.0",
@@ -50,18 +51,19 @@
     "temp": "^0.8.3"
   },
   "devDependencies": {
-    "babel": "^6.5.2",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-react": "^6.5.0",
-    "babel-preset-stage-0": "^6.5.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "grunt": "^1.0.1",
-    "grunt-babel": "^6.0.0",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-jasmine-node": "^0.3.1"
   },
-  "main": "dist/lib/index",
-  "bin": "dist/bin/jscrambler"
+  "main": "dist/index.js",
+  "bin": {
+    "jscrambler": "dist/bin/jscrambler.js"
+  }
 }
