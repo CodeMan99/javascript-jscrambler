@@ -1,4 +1,4 @@
-### Warning: This project was moved to another repository. You can find all of Jscrambler's Javascript clients [here](https://github.com/jscrambler/jscrambler)
+### Warning: This project was moved to another repository. You can find all of Jscrambler's Javascript clients [here](https://github.com/jscrambler/jscrambler).
 
 # ![jscrambler](https://rawgithub.com/jscrambler/javascript-jscrambler/master/media/jscrambler-logo.png)
 Jscrambler Client for Browser and Node.js
