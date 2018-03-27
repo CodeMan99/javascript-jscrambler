@@ -1,4 +1,9 @@
-### Warning: This project was moved to another repository. You can find Jscrambler's Javascript client and integrations [here](https://github.com/jscrambler/jscrambler).
+## Warning: This project has been moved to [another repository](https://github.com/jscrambler/jscrambler/tree/master/packages/jscrambler-cli).
+
+#### If you need to integrate your application with Jscrambler please read [our documentation](https://docs.jscrambler.com/code-integrity/documentation/api).
+
+#### You can find Jscrambler's client and integrations [here](https://github.com/jscrambler/jscrambler).
+------------------------------------------------------------------------------
 
 # ![jscrambler](https://rawgithub.com/jscrambler/javascript-jscrambler/master/media/jscrambler-logo.png)
 Jscrambler Client for Browser and Node.js
@@ -99,14 +104,14 @@ When making API requests you must pass valid secret and access keys, through the
 
 Jscrambler by default will protect your application even if errors occurred in some of your files. For example: if your app have 5 files and 1 of them has syntax errors, Jscrambler will protect the files with no errors and keep the original content in the other one.
 
-With this flag, any error/warning will make the protection fail. 
+With this flag, any error/warning will make the protection fail.
 There are two possible types of errors:
 * Syntax errors
 
     Code
     ``` javascript
     function a[] {
-      return 
+      return
     }
     ```
 
@@ -117,7 +122,7 @@ There are two possible types of errors:
     ```
 
 * Errors parsing jscrambler [code annotations](https://docs.jscrambler.com/code-annotations/overview.html)
-   
+
     Code
     ``` javascript
      //@jscrambler define __something
@@ -198,7 +203,7 @@ jscrambler.protectAndDownload({
     '/path/to/src/*.js'
   ],
   filesDest: '/path/to/destDir/',
-  params: [  
+  params: [
     {
       'name': 'whitespaceRemoval'
     },
